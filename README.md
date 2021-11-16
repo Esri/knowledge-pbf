@@ -20,6 +20,20 @@ The Knowledge Graph Service (KGS) has designed the REST end points for performan
 As a result, there are a number of nuances and contracts that a client must consider when working directly with KGS REST end points. They are outlined below.
 
 ---
+## Compiling protobuf files
+
+We have provided a powershell script `build.ps1` that will generate the encoding / decoding classes for the following languages:
+ - C++
+ - C++ DLL Export
+ - C#
+ - Python
+ - Java
+
+This script has only been tested against Windows 10 platform. It requires the existence of a `protoc.exe` compiler in the `bin` directoy of this repository. There are further instructions on how and where to acquire the compiler in the `README.md` of the `bin` directory.
+
+To compile encoding / decoding classes in JavaScript, we have provided a `jsbuild.ps1` script under the `KnowledgeGraph` directory. Please invloke `jsbuild.ps1` from the root directory of the repository. This script will generate a bundled classes in `EsriKnowledgeGraph.js` & `EsriKnowledgeGraph.min.js`
+
+---
 ## How to execute a query request
 
 The Knowledge Graph Service query REST end point is located under the graph resource:
