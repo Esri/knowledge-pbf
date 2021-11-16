@@ -1,0 +1,154 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/EsriTypes.proto";
+
+// packed array types
+message FloatArray { repeated float value = 1 [packed=true]; }
+message DoubleArray { repeated double value = 1 [packed=true]; }
+message Int32Array { repeated sint32 value = 1 [packed=true]; }
+message Int64Array { repeated sint64 value = 1 [packed=true]; }
+message BoolArray { repeated bool value = 1 [packed=true]; }
+message DateTimeArray { repeated int64 value = 1 [packed=true]; } // UTC UNIX timestamp in milliseconds.
+
+message NullArray {
+	sint64 length = 1;
+}
+
+message StringArray {
+	repeated string value = 1;
+}
+
+message GeometryValue {
+
+	message EsriDefaultGeometry {
+		bool hasZ = 1;
+		bool hasM = 2;
+		repeated uint32 lengths = 3 [packed = true]; // coordinate structure in lengths
+		repeated sint64 coords = 4 [packed = true]; // delta-encoded integer values
+	}
+
+	EsriTypes.GeometryType geometryType = 1;
+	oneof compressed_geometry {
+		EsriDefaultGeometry geometry = 2;
+	}
+}
+
+message QuantizationParameters {
+	enum QuantizeMode {
+		view = 0;
+		edit = 1;
+	}
+
+	EsriTypes.Envelope extent = 1;
+	QuantizeMode mode = 2;
+	double tolerance = 3;
+}
+
+message Transform {
+	EsriTypes.Scale scale = 1;
+	EsriTypes.Translate translate = 2;
+}
+
+message GeometryArray {
+	repeated GeometryValue value = 1;
+}
+
+message PrimitiveValue {
+	oneof value_type {
+		// Exactly one of these values must be present in a valid message
+		// Note that this list does not include "int64" as opposed to FeatureCollection
+
+		string string_value = 1;
+
+		float  float_value = 2;
+		sint32 float_compressed_as_int32 = 3; // Only use when `float((int32_t)val) == val && -1048576 <= val <= 1048575`
+
+		double double_value = 4;
+		float double_compressed_as_float = 5; // Only use when `double((float)val) == val`
+		// If `double_value` can be compressed as float and int, only compress as int when `-1048576 <= val <= 1048575`
+		sint64 double_compressed_as_int64 = 6; // Only use when `double((int64_t)val) == val && -281474976710656 <= val <= 281474976710655`
+
+		sint64 sint64_value = 7;
+		bool bool_value = 8;
+		bytes uuid_value = 9; // 16-byte RFC4122 UUID
+		// code 10 is reserved
+		GeometryValue geometry_value = 11;
+
+		// more types
+		bool null_tag = 12; // MUST ALWAYS be set to `false`
+
+		int64 datetime_value = 13; // UTC UNIX timestamp in milliseconds.
+	}
+}
+
+message ObjectValue {
+	map<string, AnyValue> properties = 1;
+}
+
+message EntityValue {
+	string label = 1;
+	map<string, AnyValue> properties = 2;
+}
+
+message RelationshipValue {
+	string type = 1;
+	map<string, AnyValue> properties = 2;
+}
+
+message PathValue {
+	repeated EntityValue entities = 1;
+	repeated RelationshipValue relationships = 2;
+}
+
+message ArrayValue {
+	repeated AnyValue values = 1;
+}
+
+message AnyValue {
+	oneof any_value_type {
+		PrimitiveValue primitive_value = 1;
+		ArrayValue array_value = 2;
+		ObjectValue object_value = 3;
+		EntityValue entity_value = 4;
+		RelationshipValue relationship_value = 5;
+		PathValue path_value = 6;
+
+		//
+		// Homogeneous array types.
+		//
+		//   These array types have far more efficient binary representations
+		//   than `ArrayValue` because the element type is known upfront and it
+		//   doesn't vary.
+		//
+
+		// packed array types (only works for primitive numeric types)
+		FloatArray float_array = 7;
+		Int32Array float_compressed_as_int32_array = 8; // see usage info in PrimitiveValue
+		DoubleArray double_array = 9;
+		FloatArray double_compressed_as_float_array = 10; // see usage info in PrimitiveValue
+		Int64Array double_compressed_as_int64_array = 11; // see usage info in PrimitiveValue
+
+		Int64Array sint64_array = 12;
+		BoolArray bool_array = 13;
+		NullArray null_array = 14;
+
+		// `uuid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+		bytes uuid_array = 15;
+
+		DateTimeArray date_array = 19; // UTC UNIX timestamp in milliseconds.
+
+		// unpacked array types
+		StringArray string_array = 16;
+		// code 17 is reserved
+		GeometryArray geometry_array = 18;
+	}
+}
+
+message Error {
+	sint64 error_code = 1;
+	string error_message = 2;
+}

@@ -1,0 +1,73 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/ObjectIdentifierSet.proto";
+
+//
+// GraphApplyEdits - Response messages
+//
+
+message EditResults {
+// For every edit result K:
+//   - oid_array[K] will hold its OID
+//   - globalid_array[K * 16 ... (K + 1) * 16 - 1] will hold its GlobalID
+//   - errors[K] will hold the Error, if any
+//
+// If errors[K] is set, then:
+//   - oid_array[K] == 0
+//   - globalid_array[K * 16 ... (K + 1) * 16 - 1] == NIL (i.e. all 16 bytes set to zero, representing the NIL UUID: {00000000-0000-0000-0000-000000000000})
+
+ObjectIdArray oid_array = 1;
+
+// `globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+bytes globalid_array = 2;
+
+// indexed by position in `oid_array`, `globalid_array`
+map<uint64, Error> errors = 3;
+}
+
+message CascadingRelationshipDeletes {
+// EditResults for all relationships that are automatically deleted by server because they were connected an entity being deleted
+EditResults relationship_delete_results = 1;
+
+// For every relationship K, that is automatically deleted by server
+//   - origin_entity_globalid_array[K * 16 ... (K + 1) * 16 - 1] will hold its `origin entity` GlobalID
+//   - dest_entity_globalid_array[K * 16 ... (K + 1) * 16 - 1] will hold its `destination entity` GlobalID
+
+// `origin_entity_globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+bytes origin_entity_globalid_array = 2;
+
+// `dest_entity_globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+bytes dest_entity_globalid_array = 3;
+}
+
+message RelationshipTypeSchemaChanges {
+repeated string origin_entity_types = 1;
+repeated string dest_entity_types = 2;
+}
+
+message GraphApplyEditsResult {
+Error error = 1; // to be used in case there was a non-entity/rel-specific reason for the failure
+
+// grouped by named object type name
+map<string, EditResults> entity_add_results = 2;
+map<string, EditResults> relationship_add_results = 3;
+
+// grouped by named object type name
+map<string, EditResults> entity_update_results = 4;
+map<string, EditResults> relationship_update_results = 5;
+
+// grouped by named object type name
+map<string, EditResults> entity_delete_results = 6;
+map<string, EditResults> relationship_delete_results = 7;
+
+// grouped by relationship type name
+map<string, CascadingRelationshipDeletes> cascading_relationship_delete_results = 8;
+
+// grouped by relationship type name
+map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
+}

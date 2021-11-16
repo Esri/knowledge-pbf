@@ -1,0 +1,21 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/EsriTypes.proto";
+
+message DomainMask {
+	bool update_type = 1;
+	bool update_name = 2;
+	bool update_domain = 3;
+	bool update_field_type = 4;
+	bool update_merge_policy = 5;
+	bool update_split_policy = 6;
+}
+
+message DomainUpdateRequest {
+	DomainMask mask = 1;
+	EsriTypes.Domain domain = 2;
+}

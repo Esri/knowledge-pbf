@@ -1,0 +1,9 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+message GraphPropertyDeleteRequest {
+	string name = 1;
+}

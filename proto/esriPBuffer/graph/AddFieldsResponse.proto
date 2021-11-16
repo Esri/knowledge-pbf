@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+
+message GraphPropertyAddResult {
+	string name = 1;
+	Error error = 2;
+}
+
+message GraphPropertyAddsResponse {
+	Error error = 1; // to be used in case there was a non-property-specific reason for the failure.
+
+	repeated GraphPropertyAddResult property_add_results = 2;
+}

@@ -1,0 +1,29 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/DataModelTypes.proto";
+
+message GraphPropertyMask {
+	bool update_name = 1;
+	bool update_alias = 2;
+	bool update_field_type = 3;
+	bool update_geometry_type = 4;
+	bool update_default_value = 5;
+	bool update_nullable = 6;
+	bool update_editable = 7;
+	bool update_visible = 8;
+	bool update_required = 9;
+	bool update_domain = 10; 
+	bool update_has_z = 12;
+	bool update_has_m = 13;
+	bool update_searchable = 14;
+}
+
+message GraphPropertyUpdateRequest {
+	GraphPropertyMask mask = 1;
+	GraphProperty graph_property = 2;
+	string property_name = 3;
+}

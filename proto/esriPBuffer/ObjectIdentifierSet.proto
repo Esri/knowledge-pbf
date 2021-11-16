@@ -1,0 +1,17 @@
+﻿syntax = "proto3";
+package esriPBuffer;
+option java_package = "com.esri.arcgis.protobuf";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+
+message ObjectIdArray { repeated uint64 value = 1 [packed=true]; }
+
+message ObjectIdentifierSet {
+	oneof id_array {
+		ObjectIdArray oid_array = 1;
+
+		// `globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+		bytes globalid_array = 2;
+	}
+}

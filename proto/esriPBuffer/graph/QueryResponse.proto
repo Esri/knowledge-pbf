@@ -1,0 +1,27 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+
+message GraphQueryResultHeader {
+	uint64 data_model_timestamp = 1; // UTC UNIX epoch in milliseconds
+	Transform transform = 2;
+	Error error = 3; // optional
+	repeated string field_names = 4;
+	bool compressed_frames = 5;
+}
+
+message GraphQueryRow {
+	repeated AnyValue values = 1;
+}
+
+message GraphQueryResultFrame {
+	Error error = 1; // optional
+	repeated GraphQueryRow rows = 2;
+
+	//exceeded_transfer_limit property can only be set on the last frame of the graph query response
+	bool exceeded_transfer_limit = 3;
+}

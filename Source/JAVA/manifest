@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Implementation-Vendor: ESRI
+Implementation-Title: com.esri.arcgis.protobuf
+Specification-Vendor: ESRI
+Name: com/esri/arcgis/protobuf
+Created-By: 1.6.0_02 (Sun Microsystems Inc.)
+Specification-Title: ESRI ArcGIS Java Protocol buffer stub
+Specification-Version: 10.7.1.FULL

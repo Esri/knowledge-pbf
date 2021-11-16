@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/DataModelTypes.proto";
+
+message GraphNamedObjectTypeAddsRequest {
+	repeated EntityType entity_types = 1;
+	repeated RelationshipType relationship_types = 2;
+}

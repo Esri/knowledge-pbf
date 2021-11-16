@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/EsriTypes.proto";
+
+
+// Domain Add is not "repeated" to prevent sending 
+// large coded-value domain definitions which may 
+// include all its coded-values over the wire.
+
+message GraphDomainAddRequest {
+	EsriTypes.Domain domains = 1;
+}

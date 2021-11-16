@@ -1,0 +1,32 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/EsriTypes.proto";
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+
+
+message GraphQueryRequest {
+	string open_cypher_query = 1;
+
+	// 4/7/2020: `parameters` can only contain combinations of:
+	//    - primitive values
+	//    - array values
+	//    - homogeneous arrays
+	//    - anonymous objects
+	// We'll throw a runtime error if the following are encountered:
+	//    - entity values
+	//    - relationship values
+	map<string, AnyValue> parameters = 2;
+
+	EsriTypes.esriFeatureEncoding feature_encoding = 3;
+	EsriTypes.SpatialReference out_sr = 4;
+	EsriTypes.DatumTransformation datum_transformation = 5;
+	// code 6 is reserved
+	QuantizationParameters quantization_parameters = 7;
+
+	// Only applies to geometries sent by the client to the server
+	Transform input_transform = 8;
+}

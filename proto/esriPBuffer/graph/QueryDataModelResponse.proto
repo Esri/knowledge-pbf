@@ -1,0 +1,22 @@
+﻿syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/EsriTypes.proto";
+import "esriPBuffer/graph/DataModelTypes.proto";
+
+message GraphDataModel {
+	uint64 data_model_timestamp = 1; // UTC UNIX epoch in milliseconds
+	EsriTypes.SpatialReference spatial_reference = 2;
+	repeated EsriTypes.Domain domains = 3;
+	repeated EntityType entity_types = 4;
+	repeated RelationshipType relationship_types = 5;
+	bool strict = 6;
+	string objectid_property = 7;
+	string globalid_property = 8;
+	string origin_entity_globalid_property = 9;
+	string dest_entity_globalid_property = 10;
+	GraphDocumentEntityTypeInfo doc_entity_type_info = 11;
+}
