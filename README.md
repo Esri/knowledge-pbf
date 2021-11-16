@@ -1,551 +1,226 @@
-# arcgis-pbf
-Integrate pbf format in arcgis services
+# knowledge-pbf
 
-Pbf is a compact binary encoding for geographic data.
+The majority of knowledge graph server REST end points use protocol buffers as a mechanism for serializing structured data during request and response phases of the REST end point. 
 
-Pbf provides lossless compression of esri data into protocol buffers. Advantages over using json:
+## What is Protobuf?
 
-* Very compact: typically makes esri responses 6 times smaller.
-* 2-2.5x smaller even when comparing gzipped sizes.
-* Very fast encoding and decoding.
-* Built in schema file for pbf format (proto files).
-* Versioning support. Pbf contains version number that can be used to support old/new Arcbuf binary files
-* Easy language integration. We will be shipping serialization/deserialization code in different languages including C#/C++/JAVA/JS/Python. More languages can also be added as needed using Google protocol buffer compiler.
-* It is based on the underlying binary format of vector tiles
+JSON as a conduit to request and recieve response data is a very verbose format. The most expensive component is serializing and deserializing JSON. Protocol buffers, or Protobuf, is a binary format created by Google to serialize data between dfferent services. It is simpler, smaller, faster and more maintainable than JSON or XML. 
 
-![alt text](https://devtopia.esri.com/khal2396/arcgis-pbf/blob/master/imgs/PbfComparison.png)
+Learn more about protocol buffers here:   
+https://developers.google.com/protocol-buffers
 
-# Json Alternative In REST API: Pbf Binary Format 
-While JSON is currently a well-accepted data serialization format, so was XML in its time. 
-Many people felt XML will never be replaced. But it is worth noting the other new formats 
-that are available now that are more optimized than JSON such as google protocol buffer 
-binary format.
+This repository holds the protobuf definitions of the structured data sent during request and response phases of HTTP messages.  
 
-When to use REST API with Json?
-* Data need to be human readable
-* Data from the service is directly consumed by a web browser
-* No ready to tie the data model to a schema
+There is also easy language integration. We will be shipping serialization/deserialization code in different languages including C#/C++/JAVA/JS/Python. More languages can also be added as needed using Google protocol buffer compiler.
 
-# Why Not Json?
-JSON has several features that make it a great candidate for general purpose data interchange. 
-The followings are the main json features:
-* The message is valid as long as JSON is well-formed. 
-* JSON is simple and supports a minimal and straightforward set of data types: strings, numbers, booleans, objects, arrays, and a null value. 
-* The data is represented in JavaScript syntax, which makes it both human-readable and easy to parse in all languages.
+## Optimized For Speed
 
-These features make JSON a useful general purpose format, but the typical use cases for spatial data may cause us to seek alternatives. 
-Spatial data typically need to be optimized along the following lines:
-* Keep network traffic small and fast
-* Minimize the amount of computation for efficient encoding and decoding
-* Use only small amounts of memory and storage
+The Knowledge Graph Service (KGS) has designed the REST end points for performance. Protobuf gives us lossless compression. Moreover, we have made specific data type and design choices to minimize the protobuf payload during transfer. 
 
-JSON might not the best candidate for meeting these requirements. 
-Some of the JSON drawbacks are:
+As a result, there are a number of nuances and contracts that a client must consider when working directly with KGS REST end points. They are outlined below.
 
-* JSON is not a space-efficient encoding. All data is expressed as ASCII strings, often with white space added and binary data must be escaped. 
-* The JSON simplicity of the data format introduces complexity in implementation. JSON’s simple types rarely match the underlying data model types typically used to represent spatial data. 
-* Lack of Schema. Arrays can contain any number of types, and there are no constraints on how the fields of an object are used or whether they are used consistently. Valid JSON contain arbitrary data that violates the data model, and it is up to the parser to solve any given data structure. 
-JSON might not be the best technology for encoding spatial data.
+---
+## How to execute a query request
 
-# The future of Binary in REST
-REST provides a good model for interacting with spatial data. Each client can easily make its state information available, and can standardize 
-on a way to create, read, update, and delete that data. But developers need REST without JSON. 
-Binary encodings might be better suited for spatial data, and with the advantage of automatically enforced schemas. 
-The traditional REST implementation of JSON over HTTP might not be the best option in all cases. 
-JSON’s string-oriented payloads might be less efficient comparing to binary encodings when it comes to data 
-transmission in terms of speed and ease of parsing. 
-Encodings like Protobuf might be a compelling alternative to JSON.
-
-# Using Protobuf in esri Pbf format
-
-![alt text](https://devtopia.esri.com/khal2396/arcgis-pbf/blob/master/imgs/PbfFeatureCollection.png)
-
-Protobuf has three main components that we have to deal with:
-* Message descriptors. When using Protobuf we have to define our messages structures in arcbuf.proto files. 
-* Message implementations. Messages definitions are not enough to represent and exchange data in any programming language. 
-We have to generate proxies/classes/objects to deal with data in the chosen programming language. 
-Google provides code generators for the most common programming languages.
-* Parsing and Serialization. After defining and creating Protobuf messages, 
-we need to be able to exchange these messages. Google protocol buffer provides 
-lib in many supported programming languages.
-
-# FeatureCollection Proto Definition (Query API f=pbf)
+The Knowledge Graph Service query REST end point is located under the graph resource:
 ```
-syntax = "proto3";
-package esriPBuffer;
-option optimize_for = LITE_RUNTIME;
-
-message FeatureCollectionPBuffer {
-		// FieldType
-		enum FieldType {
-			esriFieldTypeSmallInteger = 0;
-			esriFieldTypeInteger = 1;
-			esriFieldTypeSingle = 2;
-			esriFieldTypeDouble = 3;
-			esriFieldTypeString = 4;
-			esriFieldTypeDate = 5;
-			esriFieldTypeOID = 6;
-			esriFieldTypeGeometry = 7;
-			esriFieldTypeBlob = 8;
-			esriFieldTypeRaster = 9;
-			esriFieldTypeGUID = 10;
-			esriFieldTypeGlobalID = 11;
-			esriFieldTypeXML = 12;
-		}
-
-		// GeometryType
-		enum GeometryType {
-			esriGeometryTypePoint = 0;
-			esriGeometryTypeMultipoint = 1;
-			esriGeometryTypePolyline = 2;
-			esriGeometryTypePolygon = 3;
-			esriGeometryTypeMultipatch = 4;
-		}
-
-		// FieldType
-		enum SQLType {
-			sqlTypeBigInt = 0;
-			sqlTypeBinary = 1;
-			sqlTypeBit = 2;
-			sqlTypeChar = 3;
-			sqlTypeDate = 4;
-			sqlTypeDecimal = 5;
-			sqlTypeDouble = 6;
-			sqlTypeFloat = 7;
-			sqlTypeGeometry = 8;
-			sqlTypeGUID = 9;
-			sqlTypeInteger = 10;
-			sqlTypeLongNVarchar = 11;
-			sqlTypeLongVarbinary = 12;
-			sqlTypeLongVarchar = 13;
-			sqlTypeNChar = 14;
-			sqlTypeNVarchar = 15;
-			sqlTypeOther = 16;
-			sqlTypeReal = 17;
-			sqlTypeSmallInt = 18;
-			sqlTypeSqlXml = 19;
-			sqlTypeTime = 20;
-			sqlTypeTimestamp = 21;
-			sqlTypeTimestamp2 = 22;
-			sqlTypeTinyInt = 23;
-			sqlTypeVarbinary = 24;
-			sqlTypeVarchar = 25;
-		}
-
-		enum QuantizeOriginPostion {
-			upperLeft = 0;
-			lowerLeft = 1;
-		}
-
-		message SpatialReference {
-			uint32 wkid = 1;
-			uint32 lastestWkid = 2;
-			uint32 vcsWkid = 3;
-			uint32 latestVcsWkid = 4;
-			string wkt = 5;
-		}
-
-		message Field {
-			string name = 1; 
-			FieldType fieldType = 2;
-			string alias = 3; 
-			SQLType sqlType = 4;
-			string domain = 5; 
-			string defaultValue = 6;
-		}
-
-		 message Value {
-			oneof value_type {
-				// Exactly one of these values must be present in a valid message
-				string string_value = 1;
-				float  float_value = 2;
-				double double_value = 3;
-				sint32 sint_value = 4;
-				uint32 uint_value = 5;
-				int64  int64_value = 6;
-				uint64 uint64_value = 7;
-				sint64 sint64_value = 8;
-				bool bool_value = 9;
-			}
-		}
-
-		message Geometry {
-			GeometryType geometryType = 1;
-			repeated uint32 lengths = 2 [packed = true]; // coordinate structure in lengths
-			repeated sint32 coords = 3 [packed = true]; // delta-encoded integer values
-		}
-		
-		message esriShapeBuffer {
-			bytes bytes = 1;
-		}
-
-		message Feature {
-			//repeated uint32 attributes = 1 [packed = true];
-			repeated Value attributes = 1;
-			oneof compressed_geometry {
-				Geometry geometry = 2;
-				esriShapeBuffer shapeBuffer = 3;
-			}
-			Geometry centroid = 4;
-		}
-
-		message UniqueIdField {
-			string name = 1;
-			bool isSystemMaintained = 2;
-		}
-
-		message GeometryProperties {
-			string shapeAreaFieldName = 1;
-			string shapeLengthFieldName = 2;
-			string units = 3;
-		}
-
-		message ServerGens {
-			uint64 minServerGen = 1; 
-			uint64 serverGen = 2;
-		}
-
-		message Scale {
-			double xScale = 1;
-			double yScale = 2;
-			double mScale = 3;
-			double zScale = 4;
-		}
-
-		message Translate {
-			double xTranslate = 1;
-			double yTranslate = 2;
-			double mTranslate = 3;
-			double zTranslate = 4;
-		}
-
-		message Transform {
-			QuantizeOriginPostion quantizeOriginPostion= 1;
-			Scale scale = 2;
-			Translate translate = 3;
-		}
-
-		message FeatureResult {
-			string objectIdFieldName = 1;
-			UniqueIdField uniqueIdField = 2;
-			string globalIdFieldName = 3;
-			string geohashFieldName = 4;
-			GeometryProperties geometryProperties = 5;
-			ServerGens serverGens = 6;
-			GeometryType geometryType = 7; 
-			SpatialReference spatialReference = 8;
-			bool exceededTransferLimit = 9;
-			bool hasZ = 10;
-			bool hasM = 11;
-			Transform transform = 12;
-			repeated Field fields = 13;
-			repeated Value values = 14;
-			repeated Feature features = 15;
-		}
-
-		message CountResult{
-			uint64 count = 1;
-		}
-
-		message ObjectIdsResult {
-			string objectIdFieldName = 1;
-			ServerGens serverGens = 2;
-			repeated uint64 objectIds = 3 [packed = true];
-		}
-
-		message QueryResult
-		{
-			oneof Results {
-				FeatureResult featureResult = 1;
-				CountResult countResult = 2;
-				ObjectIdsResult idsResult = 3;
-			}
-		}
-
-		// Any compliant implementation must first read the version
-		// number encoded in this message and choose the correct
-		// implementation for this version number before proceeding to
-		// decode other parts of this message.
-		string version = 1;
-		QueryResult queryResult = 2;
-}
-```
-# Response ContentType
-Any operation that supports f=pbf needs to return "application/x-protobuf" http content type:
-
-e.g. in .NET:
-```
-	Context.Response.ContentType = "application/x-protobuf"
-```
-# Pbf Schema Definition Internals
-Pbf schema is described in fileName.proto file. The binary format schema consists of the following definition.
-```
-syntax = "proto3";
-package esriPBuffer;
-option optimize_for = LITE_RUNTIME;
+https://<server_name>/server/rest/services/Hosted/<service_name>/KnowledgeGraphServer/graph/query
 ```
 
-* First there is a syntax defined with the value proto3. This is the version of google Protobuf that is 
-currently used in defining pbf format, which currently the latest google protocol buffer version. 
-It is important to note that previous versions of Protobuf used to allow the developers to be more restrictive, 
-about the messages that they exchanged, through the usage of the required keyword. 
-This is now deprecated and not available anymore.
-* Second there is a package ArcBuffer definition. This configuration is used to nest 
-the generated classes/objects created. This will be the namespace of the generated classes.
-* Third, there is an option optimize_for definition. This configuration controls the 
-generated classes and the required runtime library. Options available are SPEED, 
-CODE_SIZE, or LITE_RUNTIME. 
-The query pbf format messages/enum are very simple and easy to understand. 
-The enum and messages are mapped to the json query results when the query result contains 
-count only, object IDs or feature collection results. 
-Each message and enum has a tag number. This tag needs to be unique per message or enum. 
-The tag is important and is enforced by google compiler. The tag also cannot be changed 
-between different versions of pbf. This would guarantee backward compatibility with older clients.
+The query request is defined in the QueryRequest.proto file as follows (as of 10.9.1):
+```proto
+message GraphQueryRequest {
+	string open_cypher_query = 1;
 
-# Enums:
-```
-	// GeometryType
-	enum GeometryType {
-		esriGeometryTypePoint = 0;
-		esriGeometryTypeMultipoint = 1;
-		esriGeoemtryTypePolyline = 2;
-		esriGeometryTypePolygon = 3;
-		esriGeometryTypeMultipatch = 4;
-	}
+	// 4/7/2020: `parameters` can only contain combinations of:
+	//    - primitive values
+	//    - array values
+	//    - homogeneous arrays
+	//    - anonymous objects
+	// We'll throw a runtime error if the following are encountered:
+	//    - entity values
+	//    - relationship values
+	map<string, AnyValue> parameters = 2;
 
-	// FieldType
-	enum FieldType {
-		esriFieldTypeSmallInteger = 0;
-		esriFieldTypeInteger = 1;
-		esriFieldTypeSingle = 2;
-		esriFieldTypeDouble = 3;
-		esriFieldTypeString = 4;
-		esriFieldTypeDate = 5;
-		esriFieldTypeOID = 6;
-		esriFieldTypeGeometry = 7;
-		esriFieldTypeBlob = 8;
-		esriFieldTypeRaster = 9;
-		esriFieldTypeGUID = 10;
-		esriFieldTypeGlobalID = 11;
-		esriFieldTypeXML = 12;
-	}
+	EsriTypes.esriFeatureEncoding feature_encoding = 3;
+	EsriTypes.SpatialReference out_sr = 4;
+	EsriTypes.DatumTransformation datum_transformation = 5;
+	bool apply_vcs_projection = 6;
+	QuantizationParameters quantization_parameters = 7;
 
-	// FieldType
-	enum SQLType {
-		sqlTypeBigInt = 0;
-		sqlTypeBinary = 1;
-		sqlTypeBit = 2;
-		sqlTypeChar = 3;
-		sqlTypeDate = 4;
-		sqlTypeDecimal = 5;
-		sqlTypeDouble = 6;
-		sqlTypeFloat = 7;
-		sqlTypeGeometry = 8;
-		sqlTypeGUID = 9;
-		sqlTypeInteger = 10;
-		sqlTypeLongNVarchar = 11;
-		sqlTypeLongVarbinary = 12;
-		sqlTypeLongVarchar = 13;
-		sqlTypeNChar = 14;
-		sqlTypeNVarchar = 15;
-		sqlTypeOther = 16;
-		sqlTypeReal = 17;
-		sqlTypeSmallInt = 18;
-		sqlTypeSqlXml = 19;
-		sqlTypeTime = 20;
-		sqlTypeTimestamp = 21;
-		sqlTypeTimestamp2 = 22;
-		sqlTypeTinyInt = 23;
-		sqlTypeVarbinary = 24;
-		sqlTypeVarchar = 25;
-	}
-
-	enum QuantizeOriginPostion {
-		upperLeft = 0;
-		lowerLeft = 1;
-	}
- ```
-# Messages:
-## Field
-```
-	message Field {       
-		string name = 1; 
-		FieldType fieldType = 2;
-		string alias = 3; 
-		SQLType sqlType = 4;
-		string domain = 5; 
-		string defaultValue = 6;
-	}
-```
-## Spatial Reference
-```
-	message SpatialReference {       
-		uint32 wkid = 1;
-		uint32 lastestWkid = 2;
-		uint32 vcsWkid = 3;
-		uint32 latestVcsWkid = 4;
-		string wkt = 5;
-	}
-```
-## Geometry/Feature
-```
-	message Geometry {
-		GeometryType geometryType = 1;
-		repeated uint32 lengths = 2 [packed = true]; // coordinate lengths
-		repeated sint32 coords = 3 [packed = true]; // delta-encoded integers
-	}    
-	message esriShapeBuffer {
-		bytes bytes = 1;
-	}
-	message Feature {
-		repeated Value attributes = 1;
-		oneof compressed_geometry {
-			Geometry geometry = 2;
-			esriShapeBuffer shapeBuffer = 3;
-		}
-		Geometry centroid = 4;
-	}
-```
-The geometry representation in pbf uses a single buffer optimized representation where 
-the geometry message contains the geometry type, length array and the quantized uint coordinate array.
-
-# Message Code Generation
-
-To generate the source code for the proto messages, I have used two libraries:
-* I have used the [Protocol Compiler](https://developers.google.com/protocol-buffers/docs/downloads) 
-provided by Google to generate C#, Java, C++,Python, JS,
-* There is also a [JavaScript compiler](https://github.com/dcodeIO/protobuf.js) (protobuf.js) to 
-generate JS source code based on FeatureCollection.proto. Protobuf.js is well documented here.
-
-The following commands are used to generate the source code to read and write pbf binary format.
-
-## All languages
-In the root folder of the repo, run this:
-
-`.\build.ps1`
-
-Any errors during code generation will be reported. Otherwise, you'll get a message saying `Code generation has completed without errors`. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
-
-# Pbf Parsing and Serialization with JS
-JS code generation
-
-An optimized JS compiler is available from google to generate an optimize JS code to encode and decode pbf binary format.
-Here are the steps to generate arcbuf.js using google js compiler:
-```
-# Install google protobufjs lib
-npm install -g protobufjs
-
-# Generate FeatureCollection.js based on FeatureCollection.proto schema file
-pbjs -t static-module -w commonjs -o \
-    FeatureCollection.js \
-    FeatureCollection.proto
-
-npm install -g browserify
-# Running browserify to bundle protobuf.js and message objects together.
-browserify FeatureCollection.js -o FeatureCollectionBundle.js
-```
-# JS Example:
-```
-Index.html:
-
-<html>
-<body>
- <!-- This has Arcbuf.js and protobuf.js code. -->
-  <script src="FeatureCollectionBundle.js"></script>
-</body>
-</html>
-
-  Query Get request with &f=pbf
-
-let req = {
-  method: 'GET',
-  responseType: 'arraybuffer', // make it clear that it can handle binary
-  url: '/some-arcbuf-get-endpoint'
-};
-return $http(req).then(function(response) {
-  // Need to encapsulate the response on Uint8Array to avoid
-  // getting it converted to string.
-  Ctrl.FeatureCollection = FeatureCollection.decode(new Uint8Array(response.data)).queryResults;
-});
-```
-
-# Query Examples (f=pbf)
-Here is a description of what the query result looks like in the pbf format.
-
-## Example 1: Feature Query Results
-
-```
-{
-  version: 1
-  featureResult: {
-    objectIdFieldName: "ObjectId"
-    globalIdFieldName: "globalId"
-    geometryType: "esriGeometryTypePolyline"
-    fields: field1
-    fields: field2
-    fields: field3
-    features {
-      attributes: "Egypt"
-      attributes: 1.23
-      attributes: "T1"
-      geometry: [3 2]
-      geometry: [2 2 0 8 8 0 1 1 2 4]
-    }
-    features {
-      attributes: "USA"
-      attributes: 2.23
-      attributes: "T2"
-      geometry: [3 2]
-      geometry: [1 1 1 9 7 2 1 1 1 2]
-    }
-    features {
-      attributes: "France"
-      attributes: 3.23
-      attributes: "T2"
-      geometry: [3 2]
-      geometry: [3 3 2 4 5 3 3 3 4 5]
-    }
-  }
+	// Only applies to geometries sent by the client to the server
+	Transform input_transform = 8;
 }
 ```
 
-Here are the coordinates of the 3 features above before quantization:
+### GET
 
-### Feature 1:
+GET query requests do not support a binary body. In other words, GET requests only support passing query parameters on the URL. 
+
+A GET query request will not stream the query response back to the client. Moreover, the number of rows returned will abide by the max records defined on the service definition.
+
+### POST
+
+Query POST requests support passing a binary body on the query request itself as well as parameters on the URL.
+
+### PBF Body
+
+The public proto repository contains helper classes in supported languages to encode a PBF `GraphQueryRequest` object, whose binary representation can be placed in the request body. Be sure to set the `Content-Type` on the request header to `application/octet-stream` to indicate the body is an __unknown binary__ file.
+
+When a POST request with a PBF binary body is sent to the Knowledge Graph Service (KGS), the response will be streamed. 
+
+## How to read the response
+The query response can be returned in HTML output or as PBF. We do not support a JSON response by design. 
+
+### Compression
+The response may be compressed according to the chart below
+
+![image](https://devtopia.esri.com/storage/user/1426/files/6568c580-1543-11ec-8b1d-2e1a363343ef)
+
+### Encoding of query response
+The query response contains 1 GraphQueryResultHeader and 0..N GraphQueryResultFrame. Every GraphQueryResultFrame contains 0..N GraphQueryRow.
+
+The tables below describes the encoding of QueryResponse
+
+- Numeric values outside of PBF messages are encoded using PBF's Varint encoding: https://developers.google.com/protocol-buffers/docs/encoding#varints
+- K : uint64_t, representing the graph result frame no. (eg: 0..N)
+
+#### When the response is gzip compressed:
+Segment no. | Size (bytes) | Type | Content | Value alias
+-|-|-|-|-
+0 | variable | uint64 (varint encoding) | Size of header message | SzHdr
+1 | SzHdr | GraphQueryResultHeader |
+(2 * K) + 2 | variable | uint64 (varint encoding) | Size of GraphQueryResultFrame message | SzRec(K)
+(2 * K) + 1 + 2 | SzRec(K) | GraphQueryResultFrame | 
+
+#### When the response is not gzip compressed:
+When the response if not gzip compressed, the individual GraphQueryResultFrame messages will be gzip compressed.
+
+Segment no. | Size (bytes) | Type | Content | Value alias
+-|-|-|-|-
+0 | variable | uint64 (varint encoding) | Size of header message | SzHdr
+1 | SzHdr | GraphQueryResultHeader |
+(2 * K) + 2 | variable | uint64 (varint encoding) | Size of gzip compressed GraphQueryResultFrame message | GzipSzRec(K)
+(2 * K) + 1 + 2 | GzipSzRec(K) | gzip compressed GraphQueryResultFrame | 
+
+### Header
+
+From the response, the client must first decode the header. The header is not compressed, and can be decoded using the usual protobuf helper classes. 
+
+For example, in Java it may look as follows:
+```java
+QueryResponse.GraphQueryResultHeader header = QueryResponse.GraphQueryResultHeader.parseDelimitedFrom(responseStream);
 ```
-	Path1: {(2,2), (2,10), (10,10)}
-	Path2: (1,1), (3,5)
-```
-### Feature 2:
-```
-	Path1: {(1,1), (2,10), (9, 9)}
-	Path2: (1,1), (2,3)
-```
-### Feature 3:
-```
-	Path1: {(3, 3), (5,7), (10, 10)}
-	Path2: (3, 3), (7, 8)
-```
-## Example 2: ObjectIds Query
-```
-{
-	version: 1
-	idsResult: {
-		objectIdFieldName: "ObjectId"
-		globalIdFieldName: "globalId"
-		objectIds: 1
-		objectIds: 3
-		objectIds: 8
-	}
+
+Let's inspect the proto header definition:
+```proto
+message GraphQueryResultHeader {
+	uint64 data_model_timestamp = 1; // UTC UNIX epoch in milliseconds
+	Transform transform = 2;
+	Error error = 3; // optional
+	repeated string field_names = 4;
+	bool compressed_frames = 5;
 }
 ```
 
-## Example 2: Count Query
+Amongst other information, the query response header will indicate whether the following response frames are compressed. The client will need to consume this boolean and choose whether to decompress the frames prior to decoding them.
+
+### Result Frames
+
+The http response header will indicate the Content-Encoding: gzip and the content-length determines the number of compressed bytes. The return format can either be HTML or PBF. 
+
+After decompressing the response, if PBF, the client will be responsible for decoding the PBF into a usable object in the language of their choice.
+
+### Streaming
+If streaming, the http response header will indicate the response is streaming by either setting the `X-Esri-Stream-Response` attribute to 'true' or by setting `Content-Type` attribute to `application/x-protobuf` and `Transfer-Encoding` to `Chunked`. As a client, you can continue to read the result frames until they are null.
+
+#### Empty Result Frames (AKA: Heart Beat)
+If streaming, clients should expect to receive empty result frames (GraphQueryResultFrame with 0 rows). Empty result frames are written in response stream to keep the http connection alive while server is busy querying the next row. An empty result frame does not indicate end of streaming instead client must continue to read the stream until they receive a null result frame. 
+
+---
+## How to execute an apply edits request
+The Knowledge Graph Service `applyEdits` REST end point is located under the graph resource:
+
 ```
-{
-	version: 1
-		countResult: {
-		count: 14
-	}
+https://<server_name>/server/rest/services/Hosted/<service_name>/KnowledgeGraphServer/graph/applyedits
+```
+
+### POST
+ApplyEdits is a POST only operation and its input parameters must be passed as PBF binary body on the post request. Be sure to set the Content-Type on the request header to `application/octet-stream` to indicate the body is an unknown binary file.
+
+### PBF Body
+PBF messages required to construct the input parameters are defined in the [ApplyEditsRequest.proto](https://devtopia.esri.com/WebGIS/arcgis-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsRequest.proto) file.
+
+#### Encoding of input parameters as PBF binary
+ApplyEdits request's input PBF binary must contain 1 uncompressed `GraphApplyEditsHeader` and 0..N compressed `GraphApplyEditsFrame`. Every `GraphApplyEditsFrame` contains entities and relationships for `adds`, `updates` and `deletes`. 
+
+##### GraphApplyEditsHeader PBF message
+```
+message GraphApplyEditsHeader {
+	EsriTypes.SpatialReference spatialReference = 1;
+
+	// Set useGlobalIDs to True if all the named objects referenced in the request are identified by GlobalID.
+	// This applies to Updates and Deletes. 
+	// If useGlobalIds=True, the server will return an error if the client is attempting to update or delete a named object by ObjectID.
+	// Conversely, if useGlobalIds=False, the server will return an error if the client is attempting to update or delete a named object by GlobalID.
+	bool useGlobalIDs = 2;
+
+	// Set cascade_delete to True for automatically deleting all relationships connected to an entity before deleting the entity.
+	// If cascade_delete=False, the client will have to provide both entities and their connected relationships for deletion, else ApplyEdits operation will fail.
+	bool cascade_delete = 3; // default value of cascade_delete is false.
+
+	// Only applies to geometries sent by the client to the server.
+	Transform input_transform = 4;
 }
 ```
+
+##### GraphApplyEditsFrame PBF message
+```
+message GraphApplyEditsFrame {
+	graph.Adds adds = 1;
+	graph.Updates updates = 2;
+	graph.Deletes deletes = 3;
+}
+```
+
+The tables below describes the encoding of ApplyEdits input request
+
+- Numeric values outside of PBF messages are encoded using PBF's Varint encoding: https://developers.google.com/protocol-buffers/docs/encoding#varints
+- K : uint64_t, representing the apply edits frame no. (eg: 0..N)
+
+Segment no. | Size (bytes) | Type | Content | Value alias
+-|-|-|-|-
+0 | variable | uint64 (varint encoding) | Size of header message | SzHdr
+1 | SzHdr | GraphApplyEditsHeader |
+(2 * K) + 2 | variable | uint64 (varint encoding) | Size of gzip compressed GraphApplyEditsFrame message | GzipSzRec(K)
+(2 * K) + 1 + 2 | GzipSzRec(K) | gzip compressed GraphApplyEditsFrame | 
+
+## How to read an apply edits response
+The ApplyEdits operation supports only PBF response. We do not support a JSON response by design. The response PBF contains 1 compressed `GraphApplyEditsResult` objects.
+
+GraphApplyEditsResult PBF message
+```
+message GraphApplyEditsResult {
+Error error = 1; // to be used in case there was a non-entity/rel-specific reason for the failure
+
+// grouped by named object type name
+map<string, EditResults> entity_add_results = 2;
+map<string, EditResults> relationship_add_results = 3;
+
+// grouped by named object type name
+map<string, EditResults> entity_update_results = 4;
+map<string, EditResults> relationship_update_results = 5;
+
+// grouped by named object type name
+map<string, EditResults> entity_delete_results = 6;
+map<string, EditResults> relationship_delete_results = 7;
+
+// grouped by relationship type name
+map<string, CascadingRelationshipDeletes> cascading_relationship_delete_results = 8;
+
+// grouped by relationship type name
+map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
+}
+```
+
+PBF messages required to read the response objects are defined in the [ApplyEditsResponse.proto](https://devtopia.esri.com/WebGIS/arcgis-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsResponse.proto) file. 
