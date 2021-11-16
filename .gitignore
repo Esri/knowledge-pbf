@@ -1,0 +1,7 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+**/.vs/**
+/Source/JAVA/src/main/java/**
+arcgis-pbf.log
