@@ -53,7 +53,7 @@ https://developers.google.com/protocol-buffers
 
 This repository holds the protobuf definitions of the structured data sent during request and response phases of HTTP messages.  
 
-There is also easy language integration. We will be shipping serialization/deserialization code in different languages including C#/C++/JAVA/JS/Python. More languages can also be added as needed using Google protocol buffer compiler.
+There is also easy language integration. We will provide a mechanism to generate serialization/deserialization code in different languages including C#/C++/JAVA/JS/Python. More languages can also be added as needed using Google protocol buffer compiler.
 
 ## Optimized For Speed
 
