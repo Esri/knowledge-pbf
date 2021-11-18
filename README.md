@@ -2,6 +2,51 @@
 
 The majority of knowledge graph server REST end points use protocol buffers as a mechanism for serializing structured data during request and response phases of the REST end point. 
 
+## Features
+* protobuf definitions to work with Knowledge Graph Service REST endpoints
+* scripts to build proto files into language specific helper classes
+
+## Instructions
+
+1. Clone the repo. 
+2. Build or download google's protoc.exe compiler. [Instructions here](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/bin/README.md)
+3. Build proto files using the [build](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/build.ps1) script.
+
+## Requirements
+
+* Google's protoc.exe compiler
+* Powershell or [Powershell Core](https://github.com/PowerShell/PowerShell)
+
+## Issues
+
+Find a bug or want to request a new feature?  Please let us know by submitting an issue.
+
+## Contributing
+
+Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
+
+## Licensing
+Copyright 2016 Esri
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+A copy of the license is available in the repository's [license.txt]( https://raw.github.com/Esri/quickstart-map-js/master/license.txt) file.
+
+[](Esri Tags: Knowledge)
+[](Esri Language: pbf)
+
+---
+
 ## What is Protobuf?
 
 JSON as a conduit to request and recieve response data is a very verbose format. The most expensive component is serializing and deserializing JSON. Protocol buffers, or Protobuf, is a binary format created by Google to serialize data between dfferent services. It is simpler, smaller, faster and more maintainable than JSON or XML. 
@@ -79,7 +124,7 @@ Query POST requests support passing a binary body on the query request itself as
 
 ### PBF Body
 
-The public proto repository contains helper classes in supported languages to encode a PBF `GraphQueryRequest` object, whose binary representation can be placed in the request body. Be sure to set the `Content-Type` on the request header to `application/octet-stream` to indicate the body is an __unknown binary__ file.
+The public proto repository contains helper scripts to generate PBF encoding/decoding classes in a variety of languages. We can use these encoding classes to encode a PBF `GraphQueryRequest` object, whose binary representation can be placed in the request body. Be sure to set the `Content-Type` on the request header to `application/octet-stream` to indicate the body is an __unknown binary__ file.
 
 When a POST request with a PBF binary body is sent to the Knowledge Graph Service (KGS), the response will be streamed. 
 
@@ -238,3 +283,9 @@ map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
 ```
 
 PBF messages required to read the response objects are defined in the [ApplyEditsResponse.proto](https://devtopia.esri.com/WebGIS/arcgis-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsResponse.proto) file. 
+
+
+
+
+
+
