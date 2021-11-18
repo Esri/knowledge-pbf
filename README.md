@@ -2,6 +2,8 @@
 
 The majority of knowledge graph server REST end points use protocol buffers as a mechanism for serializing structured data during request and response phases of the REST end point. 
 
+![App](imgs/knowledge.png)
+
 ## Features
 * protobuf definitions to work with Knowledge Graph Service REST endpoints
 * scripts to build proto files into language specific helper classes
