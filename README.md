@@ -9,7 +9,7 @@ The majority of knowledge graph server REST end points use protocol buffers as a
 ## Instructions
 
 1. Clone the repo. 
-2. Build or download google's protoc.exe compiler. [Instructions here](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/bin/README.md)
+2. Build or download google's protoc.exe compiler. [Instructions here](bin/README.md)
 3. Build proto files using the [build](build.ps1) script.
 
 ## Requirements
@@ -40,7 +40,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-A copy of the license is available in the repository's [license.txt](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/LICENSE.txt) file.
+A copy of the license is available in the repository's [license.txt](LICENSE.txt) file.
 
 ---
 
@@ -79,7 +79,7 @@ To compile encoding / decoding classes in JavaScript, we have provided a `jsbuil
 ## How to execute a query request
 
 The Knowledge Graph Service query REST end point is located under the graph resource:
-```
+```url
 https://<server_name>/server/rest/services/Hosted/<service_name>/KnowledgeGraphServer/graph/query
 ```
 
@@ -131,7 +131,7 @@ The query response can be returned in HTML output or as PBF. We do not support a
 ### Compression
 The response may be compressed according to the chart below
 
-![image](https://devtopia.esri.com/storage/user/1426/files/6568c580-1543-11ec-8b1d-2e1a363343ef)
+![image](imgs/6568c580-1543-11ec-8b1d-2e1a363343ef.png)
 
 ### Encoding of query response
 The query response contains 1 GraphQueryResultHeader and 0..N GraphQueryResultFrame. Every GraphQueryResultFrame contains 0..N GraphQueryRow.
@@ -205,7 +205,7 @@ https://<server_name>/server/rest/services/Hosted/<service_name>/KnowledgeGraphS
 ApplyEdits is a POST only operation and its input parameters must be passed as PBF binary body on the post request. Be sure to set the Content-Type on the request header to `application/octet-stream` to indicate the body is an unknown binary file.
 
 ### PBF Body
-PBF messages required to construct the input parameters are defined in the [ApplyEditsRequest.proto](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsRequest.proto) file.
+PBF messages required to construct the input parameters are defined in the [ApplyEditsRequest.proto](proto/esriPBuffer/graph/ApplyEditsRequest.proto) file.
 
 #### Encoding of input parameters as PBF binary
 ApplyEdits request's input PBF binary must contain 1 uncompressed `GraphApplyEditsHeader` and 0..N compressed `GraphApplyEditsFrame`. Every `GraphApplyEditsFrame` contains entities and relationships for `adds`, `updates` and `deletes`. 
@@ -279,10 +279,4 @@ map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
 }
 ```
 
-PBF messages required to read the response objects are defined in the [ApplyEditsResponse.proto](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsResponse.proto) file. 
-
-
-
-
-
-
+PBF messages required to read the response objects are defined in the [ApplyEditsResponse.proto](proto/esriPBuffer/graph/ApplyEditsResponse.proto) file. 
