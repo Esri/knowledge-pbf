@@ -10,7 +10,7 @@ The majority of knowledge graph server REST end points use protocol buffers as a
 
 1. Clone the repo. 
 2. Build or download google's protoc.exe compiler. [Instructions here](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/bin/README.md)
-3. Build proto files using the [build](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/build.ps1) script.
+3. Build proto files using the [build](build.ps1) script.
 
 ## Requirements
 
