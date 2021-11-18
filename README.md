@@ -26,7 +26,7 @@ Find a bug or want to request a new feature?  Please let us know by submitting a
 Esri welcomes contributions from anyone and everyone. Please see our [guidelines for contributing](https://github.com/esri/contributing).
 
 ## Licensing
-Copyright 2016 Esri
+Copyright 2021 Esri
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -40,10 +40,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-A copy of the license is available in the repository's [license.txt]( https://raw.github.com/Esri/quickstart-map-js/master/license.txt) file.
-
-[](Esri Tags: Knowledge)
-[](Esri Language: pbf)
+A copy of the license is available in the repository's [license.txt](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/LICENSE.txt) file.
 
 ---
 
@@ -200,7 +197,7 @@ If streaming, clients should expect to receive empty result frames (GraphQueryRe
 ## How to execute an apply edits request
 The Knowledge Graph Service `applyEdits` REST end point is located under the graph resource:
 
-```
+```url
 https://<server_name>/server/rest/services/Hosted/<service_name>/KnowledgeGraphServer/graph/applyedits
 ```
 
@@ -208,13 +205,13 @@ https://<server_name>/server/rest/services/Hosted/<service_name>/KnowledgeGraphS
 ApplyEdits is a POST only operation and its input parameters must be passed as PBF binary body on the post request. Be sure to set the Content-Type on the request header to `application/octet-stream` to indicate the body is an unknown binary file.
 
 ### PBF Body
-PBF messages required to construct the input parameters are defined in the [ApplyEditsRequest.proto](https://devtopia.esri.com/WebGIS/arcgis-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsRequest.proto) file.
+PBF messages required to construct the input parameters are defined in the [ApplyEditsRequest.proto](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsRequest.proto) file.
 
 #### Encoding of input parameters as PBF binary
 ApplyEdits request's input PBF binary must contain 1 uncompressed `GraphApplyEditsHeader` and 0..N compressed `GraphApplyEditsFrame`. Every `GraphApplyEditsFrame` contains entities and relationships for `adds`, `updates` and `deletes`. 
 
 ##### GraphApplyEditsHeader PBF message
-```
+```proto
 message GraphApplyEditsHeader {
 	EsriTypes.SpatialReference spatialReference = 1;
 
@@ -234,7 +231,7 @@ message GraphApplyEditsHeader {
 ```
 
 ##### GraphApplyEditsFrame PBF message
-```
+```proto
 message GraphApplyEditsFrame {
 	graph.Adds adds = 1;
 	graph.Updates updates = 2;
@@ -258,7 +255,7 @@ Segment no. | Size (bytes) | Type | Content | Value alias
 The ApplyEdits operation supports only PBF response. We do not support a JSON response by design. The response PBF contains 1 compressed `GraphApplyEditsResult` objects.
 
 GraphApplyEditsResult PBF message
-```
+```proto
 message GraphApplyEditsResult {
 Error error = 1; // to be used in case there was a non-entity/rel-specific reason for the failure
 
@@ -282,7 +279,7 @@ map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
 }
 ```
 
-PBF messages required to read the response objects are defined in the [ApplyEditsResponse.proto](https://devtopia.esri.com/WebGIS/arcgis-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsResponse.proto) file. 
+PBF messages required to read the response objects are defined in the [ApplyEditsResponse.proto](https://devtopia.esri.com/said8089/knowledge-pbf/blob/master/proto/esriPBuffer/graph/ApplyEditsResponse.proto) file. 
 
 
 
