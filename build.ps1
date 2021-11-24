@@ -318,9 +318,30 @@ function Write-Compiler-Version
 	return $protoc_ver
 }
 
+function Generate-Directories($directories)
+{
+	foreach ($dir in $directories) {
+		$exists = Test-Path -Path $dir
+
+		if (!$exists) 
+		{
+			New-Item -ItemType Directory -Force -Path $dir
+		}	
+	}
+}
+
 try 
 {
 	Validate-Package
+
+	$output_dirs = @()
+	$output_dirs += $cpp_out
+	$output_dirs += $cpp_dllexport_out
+	$output_dirs += $cs_out
+	$output_dirs += $java_out
+	$output_dirs += $python_out
+
+	Generate-Directories $output_dirs
 
 	Generate-CPP $cpp_out
 	Generate-CPP-DLL-EXPORT $cpp_dllexport_out $cpp_dllexport_macro
