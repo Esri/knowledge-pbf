@@ -239,26 +239,6 @@ function Generate-Java($java_src)
 	# First, validate compiler version is the same as runtime version used in Java
 	$protoc_ver = (&$compiler_path --version) | Out-String
 	$protoc_ver = ($protoc_ver.Split(' ')[1]).Trim()
-
-	#$pom_file_path = "Source\Java\pom.xml"
-	#$pom_contents = (cat $pom_file_path) | Out-String
-	#$does_match = $pom_contents -match "<dependency>\s*<groupId>com.google.protobuf</groupId>\s*<artifactId>protobuf-java</artifactId>\s*<version>([0-9\.]+)</version>"
-
-	#if (-not $does_match) {
-	#	throw ("CRITICAL ERROR! Could not determine Java PBF runtime version!")
-	#}
-
-	#$pom_version = $Matches[1]
-
-	#$ver_comp = Compare-Versions $protoc_ver $pom_version
-
-	#if ($ver_comp -lt 0) {
-	#	throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") is higher than Java runtime version ("+ $pom_version +"). Please update Java runtime!")
-	#}
-
-	#if (($ver_comp -eq -3) -or ($ver_comp -eq 3)) {
-	#	throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") has a different major version than the Java runtime ("+ $pom_version +")")
-	#}
 	
 	# Java wants OPTIMIZE_FOR=SPEED which is different than everybody else
 	$files_with_optimize_for_override = @()
