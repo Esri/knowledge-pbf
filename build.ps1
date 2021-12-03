@@ -1,18 +1,18 @@
 
-/* Copyright 2021 Esri
- *
- * Licensed under the Apache License Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+<# Copyright 2021 Esri
+ #
+ # Licensed under the Apache License Version 2.0 (the "License");
+ # you may not use this file except in compliance with the License.
+ # You may obtain a copy of the License at
+ #
+ #     http://www.apache.org/licenses/LICENSE-2.0
+ #
+ # Unless required by applicable law or agreed to in writing, software
+ # distributed under the License is distributed on an "AS IS" BASIS,
+ # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ # See the License for the specific language governing permissions and
+ # limitations under the License.
+ #>
  
 $compiler_path = "bin\protoc.exe"
 $proto_folder = Get-Item ".\proto"
@@ -239,26 +239,6 @@ function Generate-Java($java_src)
 	# First, validate compiler version is the same as runtime version used in Java
 	$protoc_ver = (&$compiler_path --version) | Out-String
 	$protoc_ver = ($protoc_ver.Split(' ')[1]).Trim()
-
-	$pom_file_path = "Source\Java\pom.xml"
-	$pom_contents = (cat $pom_file_path) | Out-String
-	$does_match = $pom_contents -match "<dependency>\s*<groupId>com.google.protobuf</groupId>\s*<artifactId>protobuf-java</artifactId>\s*<version>([0-9\.]+)</version>"
-
-	if (-not $does_match) {
-		throw ("CRITICAL ERROR! Could not determine Java PBF runtime version!")
-	}
-
-	$pom_version = $Matches[1]
-
-	$ver_comp = Compare-Versions $protoc_ver $pom_version
-
-	if ($ver_comp -lt 0) {
-		throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") is higher than Java runtime version ("+ $pom_version +"). Please update Java runtime!")
-	}
-
-	if (($ver_comp -eq -3) -or ($ver_comp -eq 3)) {
-		throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") has a different major version than the Java runtime ("+ $pom_version +")")
-	}
 	
 	# Java wants OPTIMIZE_FOR=SPEED which is different than everybody else
 	$files_with_optimize_for_override = @()
