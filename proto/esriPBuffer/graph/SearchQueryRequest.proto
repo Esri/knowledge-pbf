@@ -37,19 +37,12 @@ message GraphSearchRequest {
 	repeated string named_type_filter = 3;                      // Search execution is limited to specified named types.
 	esriNamedTypeCategory type_category_filter = 4;             // Limit search results to entity types, relationship types or both. Check service definition for capabilities of underlying drivers.
 
-	// Input Filter Geometry Parameters
-	GeometryValue spatial_filter = 5;                           // The spatial filter geometry.
-	Transform input_transform = 6;                              // Transformation parameters for server to decode spatial filter geometry.
-	EsriTypes.SpatialReference input_spat_ref = 7;              // The input geometry spatial reference.
-	EsriTypes.esriSpatialRel spatial_relation = 8;              // The spatial relationship to be applied to the input geometry. Defaults to esriSpatialRelIntersects.
-
+	// codes 5 - 8 are reserved
+	
 	// Output Geometry Parameters
 	bool return_geometry = 9;                                   // A flag to indicate whether the search results include geometry.
-	EsriTypes.esriFeatureEncoding feature_encoding = 10;        // Enumeration indicating the method of encoding return geometries.
-	EsriTypes.SpatialReference out_spat_ref = 11;               // The output spatial reference of the return geometries.
-	EsriTypes.DatumTransformation datum_transform = 12;         // The transformation to apply to the return geometries.
-	// code 13 is reserved                                      // A flag to indicate whether the vertical coordinate system requires projection.
-	QuantizationParameters quantization_params = 14;            // Support for coordinate quantization.
+
+	// codes 10 - 14 are reserved
 
 	// Search Result Set Options
 	sint32 start_index = 15;                                    // The index of the first result to return.
