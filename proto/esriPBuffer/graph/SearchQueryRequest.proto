@@ -37,12 +37,7 @@ message GraphSearchRequest {
 	repeated string named_type_filter = 3;                      // Search execution is limited to specified named types.
 	esriNamedTypeCategory type_category_filter = 4;             // Limit search results to entity types, relationship types or both. Check service definition for capabilities of underlying drivers.
 
-	// codes 5 - 8 are reserved
-	
-	// Output Geometry Parameters
-	bool return_geometry = 9;                                   // A flag to indicate whether the search results include geometry.
-
-	// codes 10 - 14 are reserved
+	// codes 5 - 14,m are reserved
 
 	// Search Result Set Options
 	sint32 start_index = 15;                                    // The index of the first result to return.
