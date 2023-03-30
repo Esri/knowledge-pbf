@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,12 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/DataModelTypes.proto";
 
+// ../KnowledgeGraphServer/dataModel/edit/namedTypes/<typeName>/fields/update
+
 message GraphPropertyMask {
+	reserved 14;
+	reserved "update_searchable";
+
 	bool update_name = 1;
 	bool update_alias = 2;
 	bool update_field_type = 3;
@@ -31,13 +36,13 @@ message GraphPropertyMask {
 	bool update_editable = 7;
 	bool update_visible = 8;
 	bool update_required = 9;
-	bool update_domain = 10; 
+	bool update_domain = 10;
 	bool update_has_z = 12;
 	bool update_has_m = 13;
-	bool update_searchable = 14;
 }
 
 message GraphPropertyUpdateRequest {
+	// Set the mask for desired attributes to update.
 	GraphPropertyMask mask = 1;
 	GraphProperty graph_property = 2;
 	string property_name = 3;

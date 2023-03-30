@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,21 +12,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 syntax = "proto3";
 package esriPBuffer;
 option java_package = "com.esri.arcgis.protobuf";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
+message ObjectIdArray {
+	repeated uint64 value = 1 [packed=true];
+}
 
-message ObjectIdArray { repeated uint64 value = 1 [packed=true]; }
+message IdentifierValue {
+	oneof value_type {
+		string string_value = 1;
+		sint64 sint64_value = 2;
+		bytes uuid_value = 3; // 16-byte RFC4122 UUID
+	}
+}
+
+message IdentifierArray {
+	repeated IdentifierValue value = 1;
+}
 
 message ObjectIdentifierSet {
+	message StringArray {
+		repeated string value = 1;
+	}
+
 	oneof id_array {
+		// All values are ObjectID-like: unsigned integers.
 		ObjectIdArray oid_array = 1;
 
 		// `globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
 		bytes globalid_array = 2;
+
+		// All values are strings.
+		StringArray string_array = 3;
+
+		// Mixed integer/string/uuid case.
+		// Also accepts negative integer values so it can work with non-OID integer data.
+		IdentifierArray identifier_array = 4;
 	}
 }

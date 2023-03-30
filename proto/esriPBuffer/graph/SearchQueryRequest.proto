@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,34 @@ option cc_enable_arenas = true;
 import "esriPBuffer/EsriTypes.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
-message GraphSearchRequest {
+// ../KnowledgeGraphServer/graph/search
 
-	enum esriNamedTypeCategory {
-		esriType_UNSPECIFIED = 0;
-		esriTypeEntity = 1;
-		esriTypeRelationship = 2;
-		esriTypeBoth = 3;
-	}
+message GraphSearchRequest {
+	reserved 2;
+	reserved "globalid_array";
 
 	// Search Query Parameters
 	string search_query = 1;                                    // The query string (Lucene query syntax)
-	bytes globalid_array = 2;                                   // `globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16. Used as a search filter.
+	ArrayValue identifier_array = 18;                           // Identifier filtering array
 	repeated string named_type_filter = 3;                      // Search execution is limited to specified named types.
 	esriNamedTypeCategory type_category_filter = 4;             // Limit search results to entity types, relationship types or both. Check service definition for capabilities of underlying drivers.
 
-	// codes 5 - 14 are reserved
+	// Input Filter Geometry Parameters
+	GeometryValue spatial_filter = 5;                           // The spatial filter geometry.
+	Transform input_transform = 6;                              // Transformation parameters for server to decode spatial filter geometry.
+	EsriTypes.SpatialReference input_spat_ref = 7;              // The input geometry spatial reference.
+	EsriTypes.esriSpatialRel spatial_relation = 8;              // The spatial relationship to be applied to the input geometry. Defaults to esriSpatialRelIntersects.
+
+	// Output Geometry Parameters
+	bool return_geometry = 9;                                   // A flag to indicate whether the search results include geometry.
+	EsriTypes.esriFeatureEncoding feature_encoding = 10;        // Enumeration indicating the method of encoding return geometries.
+	EsriTypes.SpatialReference out_spat_ref = 11;               // The output spatial reference of the return geometries.
+	EsriTypes.DatumTransformation datum_transform = 12;         // The transformation to apply to the return geometries.
+	bool apply_vcs_projection = 13;                             // A flag to indicate whether the vertical coordinate system requires projection.
+	QuantizationParameters quantization_params = 14;            // Support for coordinate quantization.
 
 	// Search Result Set Options
 	sint32 start_index = 15;                                    // The index of the first result to return.
 	sint32 max_num_results = 16;                                // The maximum number results to return.
-	bool return_search_context = 17;                            // Include search context fields: propertyNames, scores & highlights in the result set. Ignores the cypher_clause, and returns exactly the tuple { id(doc), [propertyName1, ..., propertyNameN], [score1,..., scoreN], [highlight1, ..., highlightN]} for each document
+	bool return_search_context = 17;                            // Include search context fields: propertyNames, scores in the result set. Ignores the cypher_clause, and returns exactly the tuple { id(doc), [propertyName1, ..., propertyNameN], [score1,..., scoreN]} for each document
 }

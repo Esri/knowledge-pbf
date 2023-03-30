@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 syntax = "proto3";
 package esriPBuffer.graph;
 option java_package = "com.esri.arcgis.protobuf.graph";
@@ -23,20 +23,43 @@ import "esriPBuffer/EsriTypes.proto";
 import "esriPBuffer/EsriExtendedTypes/EsriExtendedTypes.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
+enum GraphPropertyRole {
+	UNSPECIFIED = 0; // default
+	Regular = 1;
+
+	Document_Name = 2;
+	Document_Title = 3;
+	Document_Url = 4;
+	Document_Text = 5;
+	Document_Keywords = 6;
+	Document_ContentType = 7;
+	Document_Metadata = 8;
+	Document_FileExtension = 9;
+}
+
 enum esriGraphNamedObjectRole {
+	reserved 1;
+	reserved "esriGraphNamedObjectProvenance";
+
 	esriGraphNamedObjectRegular = 0; // default
-	esriGraphNamedObjectProvenance = 1;
 	esriGraphNamedObjectDocument = 2;
 }
 
 message NamedObjectType {
+	reserved 3;
+	reserved "display_expression";
+
 	string name = 1;
 	string alias = 2;
-	//code 3 is reserved to be used for display_expression
 	esriGraphNamedObjectRole role = 4;
 	repeated GraphProperty properties = 5;
 	repeated EsriTypes.FieldIndex field_indexes = 6;
 	bool strict = 7;
+}
+
+message EndPoint {
+	string origin_entity_type = 1;
+	string destination_entity_type = 2;
 }
 
 message EntityType {
@@ -44,41 +67,65 @@ message EntityType {
 }
 
 message RelationshipType {
-	repeated string origin_entity_types = 1;
-	repeated string dest_entity_types = 2;
-	NamedObjectType relationship = 3;
-	
-	// If strict_origin is true, origin entity types for this relationship will be restricted to entity types defined in origin_entity_types list. This also means that origin_entity_types list is static and will not be modified.
-	bool strict_origin = 4; 
+	reserved 1, 2, 4, 5;
+	reserved "origin_entity_types", "dest_entity_types", "strict_origin", "strict_dest";
 
-	// If strict_dest is true, destination entity types for this relationship will be restricted to entity types defined in dest_entity_types list. This also means that dest_entity_types list is static and will not be modified.
-	bool strict_dest = 5;
+	NamedObjectType relationship = 3;
+	repeated EndPoint observed_end_points = 6; // Endpoints in the RelationshipType definition may be out of sync with graph data.
 }
 
 message GraphProperty {
-	string name = 1; 	
+	reserved 15;
+	reserved "searchable";
+
+	string name = 1;
 	string alias = 2;
 	EsriExtendedTypes.FieldType fieldType = 3;
-	EsriTypes.GeometryType geometryType = 4; // not present if property is not of type `geometry`
-	repeated PrimitiveValue defaultValue = 5; // may be more than 1 for arrays
-	bool not_nullable = 6; // by default props are nullable
-	bool not_editable = 7; // by default props are editable
-	bool not_visible = 8; // by default props are visible
-	bool required = 9; // by default props are not required
+	EsriTypes.GeometryType geometryType = 4;    // not present if property is not of type `geometry`
+	repeated PrimitiveValue defaultValue = 5;   // may be more than 1 for arrays
+	bool not_nullable = 6;                      // by default props are nullable
+	bool not_editable = 7;                      // by default props are editable
+	bool not_visible = 8;                       // by default props are visible
+	bool required = 9;                          // by default props are not required
 	bool isSystemMaintained = 10;
 	string domain = 11;
-	bool hasZ = 13; // only applies if type is geometry
-	bool hasM = 14; // only applies if type is geometry
-	bool searchable = 15; // by default props are not searchable
+	bool hasZ = 13;                             // only applies if type is geometry
+	bool hasM = 14;                             // only applies if type is geometry
+
+	oneof role_type {
+		GraphPropertyRole role = 16;
+	}
 }
 
-message GraphDocumentEntityTypeInfo {
-	string name_property = 1;
-	string title_property = 2;
-	string url_property = 3;
-	string text_property = 4;
-	string keywords_property = 5;
-	string content_type_property = 6;
-	string metadata_property = 7;
-	string file_extension_property = 8;
+enum UUIDMethodHint {
+	MethodHint_UNSPECIFIED = 0;
+	UUID_ESRI = 1;                // UUID in Esri/Microsoft format of the form: {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}
+	UUID_RFC_4122 = 2;            // UUID in RFC4122 lowercase format
+}
+
+message IdentifierGenerationInfo {
+	oneof generation_method {
+		UUIDMethodHint uuid_method_hint = 1;
+	}
+}
+
+message DatabaseNativeIdentifier {
+	// Durable, settable database native identifier. Not necessarily a defined Graph Property of [Entity|Relationship]Values
+}
+
+message UniformPropertyIdentifier {
+	// User-defined property that guarantees named type category uniqueness & is uniformly named across the graph
+	string identifier_property_name = 1;
+}
+
+message IdentifierMappingInfo {
+	oneof identifier_maps_to {
+		DatabaseNativeIdentifier native_identifier = 1;
+		UniformPropertyIdentifier uniform_property = 2;
+	}
+}
+
+message IdentifierInfo {
+	IdentifierMappingInfo mapping_info = 1;
+	IdentifierGenerationInfo generation_info = 2;
 }

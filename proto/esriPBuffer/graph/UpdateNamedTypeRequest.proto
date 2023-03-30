@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,12 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/DataModelTypes.proto";
 
+// ../KnowledgeGraphServer/dataModel/edit/namedTypes/<typeName>/update
+
 message GraphNamedObjectTypeUpdateRequest {
+	reserved 3;
+	reserved "meta_entity_update";
+
 	oneof named_type_update {
 		GraphEntityTypeUpdate entity_update = 1;
 		GraphRelationshipTypeUpdate relationship_update = 2;
@@ -29,11 +34,13 @@ message GraphNamedObjectTypeUpdateRequest {
 }
 
 message NamedObjectTypeMask {
+	reserved 3;
+	reserved "display_expression";
+
 	bool update_name = 1;
 	bool update_alias = 2;
-	//code 3 is reserved
 	bool update_role = 4;
-	// code 5 is reserved
+	bool update_strict = 5;
 }
 
 message GraphEntityTypeUpdate {
@@ -42,17 +49,15 @@ message GraphEntityTypeUpdate {
 }
 
 message RelationshipTypeMask {
+	reserved 2, 3, 4, 5, 6, 7;
+	reserved "add_origin_entity_types",
+			"delete_origin_entity_types",
+			"add_dest_entity_types",
+			"delete_dest_entity_types",
+			"update_strict_origin",
+			"update_strict_dest";
+
 	NamedObjectTypeMask named_object_type_mask = 1;
-	oneof origin_entity_type {
-		bool add_origin_entity_types = 2;
-		bool delete_origin_entity_types = 3;
-	}
-	oneof dest_entity_type {
-		bool add_dest_entity_types = 4;
-		bool delete_dest_entity_types = 5;
-	}
-	// code 6 is reserved
-	// code 7 is reserved
 }
 
 message GraphRelationshipTypeUpdate {

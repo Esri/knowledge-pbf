@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 syntax = "proto3";
 package esriPBuffer.graph;
 option java_package = "com.esri.arcgis.protobuf.graph";
@@ -20,69 +20,69 @@ option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/EsriGraphTypes.proto";
-import "esriPBuffer/ObjectIdentifierSet.proto";
+import "esriPBuffer/graph/DataModelTypes.proto";
 
 //
 // GraphApplyEdits - Response messages
+// ../KnowledgeGraphServer/graph/applyedits
 //
 
 message EditResults {
-// For every edit result K:
-//   - oid_array[K] will hold its OID
-//   - globalid_array[K * 16 ... (K + 1) * 16 - 1] will hold its GlobalID
-//   - errors[K] will hold the Error, if any
-//
-// If errors[K] is set, then:
-//   - oid_array[K] == 0
-//   - globalid_array[K * 16 ... (K + 1) * 16 - 1] == NIL (i.e. all 16 bytes set to zero, representing the NIL UUID: {00000000-0000-0000-0000-000000000000})
+  reserved 1, 2;
+  reserved "oid_array", "globalid_array";
 
-ObjectIdArray oid_array = 1;
+  // For every edit result K:
+  //   - errors[K] will hold the Error, if any
+  //
+  // If errors[K] is set, then:
+  //   - id_array[K] == null_tag or null equivalent of AnyValue
 
-// `globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
-bytes globalid_array = 2;
+  // indexed by position in `id_array`
+  map<uint64, Error> errors = 3;
 
-// indexed by position in `oid_array`, `globalid_array`
-map<uint64, Error> errors = 3;
+  // unique id value for every edit result K
+  ArrayValue id_array = 4;
 }
 
 message CascadingRelationshipDeletes {
-// EditResults for all relationships that are automatically deleted by server because they were connected an entity being deleted
-EditResults relationship_delete_results = 1;
+  reserved 2, 3;
+  reserved "origin_entity_globalid_array", "dest_entity_globalid_array";
 
-// For every relationship K, that is automatically deleted by server
-//   - origin_entity_globalid_array[K * 16 ... (K + 1) * 16 - 1] will hold its `origin entity` GlobalID
-//   - dest_entity_globalid_array[K * 16 ... (K + 1) * 16 - 1] will hold its `destination entity` GlobalID
+  // EditResults for all relationships automatically deleted because they were connected to a deleted entity.
+  EditResults relationship_delete_results = 1;
 
-// `origin_entity_globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
-bytes origin_entity_globalid_array = 2;
+  // The array of origin entity unique identifiers.
+  ArrayValue origin_entity_id_array = 4;
 
-// `dest_entity_globalid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
-bytes dest_entity_globalid_array = 3;
+  // The array of destination entity unique identifiers.
+  ArrayValue dest_entity_id_array = 5;
 }
 
 message RelationshipTypeSchemaChanges {
-repeated string origin_entity_types = 1;
-repeated string dest_entity_types = 2;
+  reserved 1, 2;
+  reserved "origin_entity_types", "dest_entity_types";
+
+  repeated EndPoint new_end_points = 3;
 }
 
 message GraphApplyEditsResult {
-Error error = 1; // to be used in case there was a non-entity/rel-specific reason for the failure
+  Error error = 1; // High level error in case there was a non-entity/rel-specific reason for the failure.
 
-// grouped by named object type name
-map<string, EditResults> entity_add_results = 2;
-map<string, EditResults> relationship_add_results = 3;
+  // Grouped by named object type name
+  map<string, EditResults> entity_add_results = 2;
+  map<string, EditResults> relationship_add_results = 3;
 
-// grouped by named object type name
-map<string, EditResults> entity_update_results = 4;
-map<string, EditResults> relationship_update_results = 5;
+  // Grouped by named object type name
+  map<string, EditResults> entity_update_results = 4;
+  map<string, EditResults> relationship_update_results = 5;
 
-// grouped by named object type name
-map<string, EditResults> entity_delete_results = 6;
-map<string, EditResults> relationship_delete_results = 7;
+  // Grouped by named object type name
+  map<string, EditResults> entity_delete_results = 6;
+  map<string, EditResults> relationship_delete_results = 7;
 
-// grouped by relationship type name
-map<string, CascadingRelationshipDeletes> cascading_relationship_delete_results = 8;
+  // Grouped by relationship type name
+  map<string, CascadingRelationshipDeletes> cascading_relationship_delete_results = 8;
 
-// grouped by relationship type name
-map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
+  // Grouped by relationship type name
+  map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
 }

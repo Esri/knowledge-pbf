@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,14 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/EsriTypes.proto";
 import "esriPBuffer/graph/DataModelTypes.proto";
+import "esriPBuffer/graph/SearchTypes.proto";
+
+// ../KnowledgeGraphServer/dataModel/queryDataModel
 
 message GraphDataModel {
+	reserved 9, 10, 11, 12, 13;
+	reserved "origin_entity_globalid_property", "dest_entity_globalid_property", "doc_entity_type_info", "prov_meta_entity_type_info", "meta_entity_types";
+
 	uint64 data_model_timestamp = 1; // UTC UNIX epoch in milliseconds
 	EsriTypes.SpatialReference spatial_reference = 2;
 	repeated EsriTypes.Domain domains = 3;
@@ -31,7 +37,7 @@ message GraphDataModel {
 	bool strict = 6;
 	string objectid_property = 7;
 	string globalid_property = 8;
-	string origin_entity_globalid_property = 9;
-	string dest_entity_globalid_property = 10;
-	GraphDocumentEntityTypeInfo doc_entity_type_info = 11;
+	repeated SearchIndex search_indexes = 14;
+	IdentifierInfo identifier_info = 15;
+	bool arcgis_managed_data = 16;
 }

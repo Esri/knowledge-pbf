@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,15 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
+// ../KnowledgeGraphServer/dataModel/edit/namedTypes/<typeName>/indexes/delete
+
 message GraphIndexDeleteResult {
 	string name = 1;
 	Error error = 2;
 }
 
 message GraphIndexDeleteResponse {
-	Error error = 1; // to be used in case there was a non-index-specific reason for the failure.
+	Error error = 1; // High level error in case there is a non-index-specific reason for the failure.
 
 	repeated GraphIndexDeleteResult index_delete_results = 2;
 }

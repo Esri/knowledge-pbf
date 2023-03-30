@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 syntax = "proto3";
 package esriPBuffer.graph;
 option java_package = "com.esri.arcgis.protobuf.graph";
@@ -37,18 +37,23 @@ message StringArray {
 	repeated string value = 1;
 }
 
+message BlobArray {
+	repeated bytes value = 1;
+}
+
 message GeometryValue {
 
 	message EsriDefaultGeometry {
 		bool hasZ = 1;
 		bool hasM = 2;
 		repeated uint32 lengths = 3 [packed = true]; // coordinate structure in lengths
-		repeated sint64 coords = 4 [packed = true]; // delta-encoded integer values
+		repeated sint64 coords = 4 [packed = true];  // delta-encoded integer values
 	}
 
 	EsriTypes.GeometryType geometryType = 1;
 	oneof compressed_geometry {
 		EsriDefaultGeometry geometry = 2;
+		bytes compressedShapeBuffer = 3;
 	}
 }
 
@@ -90,28 +95,42 @@ message PrimitiveValue {
 		sint64 sint64_value = 7;
 		bool bool_value = 8;
 		bytes uuid_value = 9; // 16-byte RFC4122 UUID
-		// code 10 is reserved
+		bytes blob_value = 10;
 		GeometryValue geometry_value = 11;
 
-		// more types
 		bool null_tag = 12; // MUST ALWAYS be set to `false`
-
 		int64 datetime_value = 13; // UTC UNIX timestamp in milliseconds.
 	}
 }
 
+// Order preserving KeyValuePair
+message KeyValuePair {
+	string key = 1;
+	AnyValue value = 2;
+}
+
 message ObjectValue {
-	map<string, AnyValue> properties = 1;
+	reserved 1; // Used prior to 11.1 for map-based KeyValuePair representation.
+
+	repeated KeyValuePair properties = 2;
 }
 
 message EntityValue {
+	reserved 2; // Used prior to 11.1 for map-based KeyValuePair representation.
+
 	string label = 1;
-	map<string, AnyValue> properties = 2;
+	AnyValue id = 3;
+	repeated KeyValuePair properties = 4;
 }
 
 message RelationshipValue {
+	reserved 2; // Used prior to 11.1 for map-based KeyValuePair representation.
+
 	string type = 1;
-	map<string, AnyValue> properties = 2;
+	AnyValue id = 3;
+	AnyValue origin_id = 4;
+	AnyValue dest_id = 5;
+	repeated KeyValuePair properties = 6;
 }
 
 message PathValue {
@@ -119,11 +138,63 @@ message PathValue {
 	repeated RelationshipValue relationships = 2;
 }
 
-message ArrayValue {
+message AnyValueArray {
 	repeated AnyValue values = 1;
 }
 
+message ArrayValue {
+	reserved 1;
+	reserved "values";
+
+	oneof array_type {
+		// Heterogeneous array type
+		AnyValueArray any_value_array = 2;
+
+		//
+		// Homogeneous array types.
+		//   Smaller payload than `ArrayValue` because the element type is known upfront and it
+		//   doesn't vary.
+		//
+		// packed array types (only works for primitive numeric types)
+		FloatArray float_array = 3;
+		Int32Array float_compressed_as_int32_array = 4; // see usage info in PrimitiveValue
+		DoubleArray double_array = 5;
+		FloatArray double_compressed_as_float_array = 6; // see usage info in PrimitiveValue
+		Int64Array double_compressed_as_int64_array = 7; // see usage info in PrimitiveValue
+
+		Int64Array sint64_array = 8;
+		BoolArray bool_array = 9;
+		NullArray null_array = 10;
+
+		// `uuid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+		bytes uuid_array = 11;
+
+		DateTimeArray date_array = 12; // UTC UNIX timestamp in milliseconds.
+
+		// unpacked array types
+		StringArray string_array = 13;
+		BlobArray blob_array = 14;
+		GeometryArray geometry_array = 15;
+	}
+}
+
 message AnyValue {
+	reserved 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19;
+	reserved
+			"float_array",
+			"float_compressed_as_int32_array",
+			"double_array",
+			"double_compressed_as_float_array",
+			"double_compressed_as_int64_array",
+			"sint64_array",
+			"bool_array",
+			"null_array",
+			"uuid_array",
+			"string_array",
+			"blob_array",
+			"geometry_array",
+			"date_array";
+
 	oneof any_value_type {
 		PrimitiveValue primitive_value = 1;
 		ArrayValue array_value = 2;
@@ -131,39 +202,18 @@ message AnyValue {
 		EntityValue entity_value = 4;
 		RelationshipValue relationship_value = 5;
 		PathValue path_value = 6;
-
-		//
-		// Homogeneous array types.
-		//
-		//   These array types have far more efficient binary representations
-		//   than `ArrayValue` because the element type is known upfront and it
-		//   doesn't vary.
-		//
-
-		// packed array types (only works for primitive numeric types)
-		FloatArray float_array = 7;
-		Int32Array float_compressed_as_int32_array = 8; // see usage info in PrimitiveValue
-		DoubleArray double_array = 9;
-		FloatArray double_compressed_as_float_array = 10; // see usage info in PrimitiveValue
-		Int64Array double_compressed_as_int64_array = 11; // see usage info in PrimitiveValue
-
-		Int64Array sint64_array = 12;
-		BoolArray bool_array = 13;
-		NullArray null_array = 14;
-
-		// `uuid_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
-		bytes uuid_array = 15;
-
-		DateTimeArray date_array = 19; // UTC UNIX timestamp in milliseconds.
-
-		// unpacked array types
-		StringArray string_array = 16;
-		// code 17 is reserved
-		GeometryArray geometry_array = 18;
+		AnyValue unknown_value = 20;
 	}
 }
 
 message Error {
 	sint64 error_code = 1;
 	string error_message = 2;
+}
+
+enum esriNamedTypeCategory {
+	esriType_UNSPECIFIED = 0;
+	esriTypeEntity = 1;
+	esriTypeRelationship = 2;
+	esriTypeBoth = 3;
 }
