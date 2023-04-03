@@ -1,5 +1,5 @@
 
-<# Copyright 2021 Esri
+<# Copyright 2023 Esri
  #
  # Licensed under the Apache License Version 2.0 (the "License");
  # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  #>
  
 $compiler_path = "bin\protoc.exe"
+$runtime_ver = "19.4"
 $proto_folder = Get-Item ".\proto"
 
 # C++
@@ -145,6 +146,24 @@ function Validate-Package()
 	}
 }
 
+function Validate-Protoc-Version() 
+{
+    # First, validate compiler version is the same as runtime version
+	$protoc_ver = (&$compiler_path --version) | Out-String
+	$protoc_ver = ($protoc_ver.Split(' ')[1]).Trim()
+
+    $ver_comp = Compare-Versions $protoc_ver $runtime_ver
+    if ($ver_comp -lt 0) 
+    {
+        throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") is higher than server runtime version ("+ $runtime_ver + "). Please update protobuf compiler version!")
+    }
+
+
+    if (($ver_comp -eq -3) -or ($ver_comp -eq 3)) {
+		throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") has a different major version than the server runtime ("+ $runtime_ver +")")
+	}
+}
+
 function Invoke-Compiler($includes, $out_path_arg, $out_path, $protoFiles)
 {	
 	$file_rel_paths = @()
@@ -240,6 +259,7 @@ function Generate-Java($java_src)
 	$protoc_ver = (&$compiler_path --version) | Out-String
 	$protoc_ver = ($protoc_ver.Split(' ')[1]).Trim()
 	
+
 	# Java wants OPTIMIZE_FOR=SPEED which is different than everybody else
 	$files_with_optimize_for_override = @()
 	$files_with_optimize_for_override_orig_value = @()
@@ -313,6 +333,7 @@ function Generate-Directories($directories)
 try 
 {
 	Validate-Package
+    Validate-Protoc-Version
 
 	$output_dirs = @()
 	$output_dirs += $cpp_out
