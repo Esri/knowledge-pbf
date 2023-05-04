@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
 import "esriPBuffer/EsriTypes.proto";
+
+// ../KnowledgeGraphServer/dataModel/domains/<domainName>/update
 
 message DomainMask {
 	bool update_type = 1;

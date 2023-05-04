@@ -1,4 +1,4 @@
-﻿/* Copyright 2021 Esri
+﻿/* Copyright 2023 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,12 @@ option cc_enable_arenas = true;
 import "esriPBuffer/EsriTypes.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
+// ../KnowledgeGraphServer/graph/query
 
 message GraphQueryRequest {
 	string open_cypher_query = 1;
 
-	// 4/7/2020: `parameters` can only contain combinations of:
+	// `parameters` can only contain combinations of:
 	//    - primitive values
 	//    - array values
 	//    - homogeneous arrays
@@ -39,7 +40,7 @@ message GraphQueryRequest {
 	EsriTypes.esriFeatureEncoding feature_encoding = 3;
 	EsriTypes.SpatialReference out_sr = 4;
 	EsriTypes.DatumTransformation datum_transformation = 5;
-	// code 6 is reserved
+	bool apply_vcs_projection = 6;
 	QuantizationParameters quantization_parameters = 7;
 
 	// Only applies to geometries sent by the client to the server

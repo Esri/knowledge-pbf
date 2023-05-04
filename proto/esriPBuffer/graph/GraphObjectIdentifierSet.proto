@@ -14,26 +14,15 @@
  */
 
 syntax = "proto3";
-package esriPBuffer.EsriExtendedTypes;
-option java_package = "com.esri.arcgis.protobuf.extendedtypes";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
-// FieldType with an UNSPECIFIED member. Not binary compatible with EsriTypes.FieldType.
-enum FieldType {
-	esriFieldType_UNSPECIFIED = 0; // This means the value was not set in the PBF message.
-	esriFieldTypeSmallInteger = 1;
-	esriFieldTypeInteger = 2;
-	esriFieldTypeSingle = 3;
-	esriFieldTypeDouble = 4;
-	esriFieldTypeString = 5;
-	esriFieldTypeDate = 6;
-	esriFieldTypeOID = 7;
-	esriFieldTypeGeometry = 8;
-	esriFieldTypeBlob = 9;
-	esriFieldTypeRaster = 10;
-	esriFieldTypeGUID = 11;
-	esriFieldTypeGlobalID = 12;
-	esriFieldTypeXML = 13;
-}
+import "esriPBuffer/graph/EsriGraphTypes.proto";
 
+message GraphObjectIdentifierSet {
+  oneof id_array_type {
+    ArrayValue id_array = 1;
+  }
+}
