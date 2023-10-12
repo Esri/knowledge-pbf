@@ -77,10 +77,159 @@ message GeometryArray {
 	repeated GeometryValue value = 1;
 }
 
+message TimestampOffsetArray {
+	repeated TimestampOffsetValue value = 1;
+}
+
+message TimeOnlyArray {
+	repeated TimeOnlyValue value = 1;
+}
+
+message DateOnlyArray {
+	repeated DateOnlyValue value = 1;
+}
+
+message DurationArray {
+	repeated DurationValue value = 1;
+}
+
+message TimeZone {
+	// IANA Time Zone Database TZ identifier
+	//  i.e. Europe/Zurich, America/Los_Angeles, etc
+	string tz_id = 1;
+}
+
+message DateTimeComponents {
+	// Year of date. Must be in the range [0, 9999].
+	int32 year = 1;
+
+	// Month of year. Must be in the range [1, 12].
+	int32 month = 2;
+
+	// Day of month. Must be in the range [1, 31].
+	int32 day = 3;
+
+	// Hours of day in 24 hour format. Must be in the range [0,23].
+	int32 hours = 4;
+
+	// Minutes of hour of day. Must be in the range [0, 59].
+	int32 minutes = 5;
+
+	// Seconds of minute. Must be in the range [0, 59].
+	int32 seconds = 6;
+
+	// milliseconds of second. Must be in the range [0, 999].
+	int32 milliseconds = 7;
+}
+
+// `DateTimeOffset` represents a civil time encoded as components of date, time & time offset.
+// The date is relative to the proleptic Gregorian calendar.
+//
+message DateTimeOffset {
+	oneof local_date_time {
+		// A time-zone-independent representation of time with exactly 24-hour days, 60-minute hours, and 60-second minutes.
+		// Represents a count of milliseconds relative to midnight on January 1, 1970, ignoring any timezone or offset component.
+		//
+		// The `local_epoch_ms` range is restricted to 0000-01-01T00:00:00.000 (-62167219200000) to 9999-12:31T23:59:59.999 (253402300799999).
+		// This restriction is in place to support conversion to and from ISO8601 date format strings.
+		//
+		// All minutes are 60 seconds long. The leap second is spread equally over the last 1000 seconds of the day,
+		// maintaining the appearance of exactly 86,400 seconds per day.
+		sint64 local_epoch_ms = 1;
+
+		// Time-zone-independent civil date time represented as individual components.
+		DateTimeComponents date_time_components = 2;
+	}
+
+	// If `time_offset` is not set, UTC time zone of +0:00 is assumed.
+	oneof time_offset {
+		// UTC offset in whole seconds between -18 hours and +18 hours.
+		// A UTC offset of -8:00 would be represented as -28800.
+		sint32 utc_offset = 8;
+	}
+}
+
+message TimestampOffsetValue {
+	oneof date_time_format {
+		DateTimeOffset date_time_offset = 1;
+		string iso8601_date_format = 2;
+	}
+}
+
+message DateOnlyComponents {
+	// Year of date. Must be in the range [0, 9999].
+	int32 year = 1;
+
+	// Month of year. Must be in the range [1, 12].
+	int32 month = 2;
+
+	// Day of month. Must be in the range [1, 31].
+	int32 day = 3;
+}
+
+message DateOnlyValue {
+	oneof date_only_format {
+		// Days since UNIX epoch.
+		// The `epoch_days` values are restricted from 0000-01-01 (-719528) to 9999-12-31 (2932896) to support conversion
+		// to and from ISO 8601 Date strings.
+		sint32 epoch_days = 1;
+		DateOnlyComponents date_only_components = 2;
+		string iso8601_date_only_format = 3;
+	}
+}
+
+message TimeOnlyComponents {
+	// Hours of day in 24 hour format. Must be in the range [0,23].
+	int32 hours = 1;
+
+	// Minutes of hour of day. Must be in the range [0, 59].
+	int32 minutes = 2;
+
+	// Seconds of minute. Must be in the range [0, 59].
+	int32 seconds = 3;
+
+	// milliseconds of second. Must be in the range [0, 999].
+	int32 milliseconds = 4;
+}
+
+message TimeOnlyValue {
+	oneof time_only_format {
+		// `milliseconds_of_day` values are restricted from 00:00:00 (0) representing midnight to 23:59:59 (86399999).
+		uint32 milliseconds_of_day = 1;
+		TimeOnlyComponents time_only_components = 2;
+		string iso8601_time_only_format = 3;
+	}
+}
+
+message DurationComponents {
+	// The count of months spanning the duration.
+	sint64 months = 1;
+
+	// The count of days spanning the duration.
+	sint64 days = 2;
+
+	// The count of seconds spanning the duration.
+	sint64 seconds = 3;
+
+	// The count of milliseconds spanning the duration.
+	sint64 milliseconds = 4;
+}
+
+// A `DurationValue` represents a signed span of time.
+// It is related to `TimeOnlyValue`, `TimestampOffsetValue`, `DateOnlyValue` & `datetime_value`
+// in that the difference between 2 temporal instants is a `DurationValue`, and it can be
+// added / subtracted from a temporal instant.
+message DurationValue {
+	oneof duration_format {
+		DurationComponents duration_components = 1;
+		string iso8601_duration_format = 2;
+	}
+}
+
 message PrimitiveValue {
 	oneof value_type {
 		// Exactly one of these values must be present in a valid message
-		// Note that this list does not include "int64" as opposed to FeatureCollection
+		// Note that this list does not include `int64` as opposed to `FeatureCollection`
 
 		string string_value = 1;
 
@@ -100,23 +249,27 @@ message PrimitiveValue {
 
 		bool null_tag = 12; // MUST ALWAYS be set to `false`
 		int64 datetime_value = 13; // UTC UNIX timestamp in milliseconds.
+		TimestampOffsetValue timestamp_offset_value = 14;
+		DateOnlyValue date_only_value = 15;
+		TimeOnlyValue time_only_value = 16;
+		DurationValue duration_value = 17;
 	}
 }
 
-// Order preserving KeyValuePair
+// Order preserving `KeyValuePair`
 message KeyValuePair {
 	string key = 1;
 	AnyValue value = 2;
 }
 
 message ObjectValue {
-	reserved 1; // Used prior to 11.1 for map-based KeyValuePair representation.
+	reserved 1; // Used prior to 11.1 for map-based `KeyValuePair` representation.
 
 	repeated KeyValuePair properties = 2;
 }
 
 message EntityValue {
-	reserved 2; // Used prior to 11.1 for map-based KeyValuePair representation.
+	reserved 2; // Used prior to 11.1 for map-based `KeyValuePair` representation.
 
 	string label = 1;
 	AnyValue id = 3;
@@ -124,7 +277,7 @@ message EntityValue {
 }
 
 message RelationshipValue {
-	reserved 2; // Used prior to 11.1 for map-based KeyValuePair representation.
+	reserved 2; // Used prior to 11.1 for map-based `KeyValuePair` representation.
 
 	string type = 1;
 	AnyValue id = 3;
@@ -157,10 +310,10 @@ message ArrayValue {
 		//
 		// packed array types (only works for primitive numeric types)
 		FloatArray float_array = 3;
-		Int32Array float_compressed_as_int32_array = 4; // see usage info in PrimitiveValue
+		Int32Array float_compressed_as_int32_array = 4; // see usage info in `PrimitiveValue`
 		DoubleArray double_array = 5;
-		FloatArray double_compressed_as_float_array = 6; // see usage info in PrimitiveValue
-		Int64Array double_compressed_as_int64_array = 7; // see usage info in PrimitiveValue
+		FloatArray double_compressed_as_float_array = 6; // see usage info in `PrimitiveValue`
+		Int64Array double_compressed_as_int64_array = 7; // see usage info in `PrimitiveValue`
 
 		Int64Array sint64_array = 8;
 		BoolArray bool_array = 9;
@@ -175,6 +328,10 @@ message ArrayValue {
 		StringArray string_array = 13;
 		BlobArray blob_array = 14;
 		GeometryArray geometry_array = 15;
+		TimestampOffsetArray timestamp_offset_array = 16;
+		TimeOnlyArray time_only_array = 17;
+		DateOnlyArray date_only_array = 18;
+		DurationArray duration_array = 19;
 	}
 }
 
@@ -212,8 +369,12 @@ message Error {
 }
 
 enum esriNamedTypeCategory {
+	option allow_alias = true;
+
 	esriType_UNSPECIFIED = 0;
 	esriTypeEntity = 1;
 	esriTypeRelationship = 2;
-	esriTypeBoth = 3;
+	esriTypeBothEntityRelationship = 3;  // alias for `esriTypeBoth`.
+	esriTypeBoth = 3;                    // alias for `esriTypeBothEntityRelationship`.
+	esriTypeMetaEntityProvenance = 4;
 }

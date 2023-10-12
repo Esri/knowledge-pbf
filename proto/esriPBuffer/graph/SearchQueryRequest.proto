@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 syntax = "proto3";
 package esriPBuffer.graph;
 option java_package = "com.esri.arcgis.protobuf.graph";
@@ -21,6 +21,7 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/EsriTypes.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/graph/QueryTypes.proto";
 
 // ../KnowledgeGraphServer/graph/search
 
@@ -38,7 +39,7 @@ message GraphSearchRequest {
 	GeometryValue spatial_filter = 5;                           // The spatial filter geometry.
 	Transform input_transform = 6;                              // Transformation parameters for server to decode spatial filter geometry.
 	EsriTypes.SpatialReference input_spat_ref = 7;              // The input geometry spatial reference.
-	EsriTypes.esriSpatialRel spatial_relation = 8;              // The spatial relationship to be applied to the input geometry. Defaults to esriSpatialRelIntersects.
+	EsriTypes.esriSpatialRel spatial_relation = 8;              // The spatial relationship to be applied to the input geometry. Defaults to `esriSpatialRelIntersects`.
 
 	// Output Geometry Parameters
 	bool return_geometry = 9;                                   // A flag to indicate whether the search results include geometry.
@@ -51,5 +52,10 @@ message GraphSearchRequest {
 	// Search Result Set Options
 	sint32 start_index = 15;                                    // The index of the first result to return.
 	sint32 max_num_results = 16;                                // The maximum number results to return.
-	bool return_search_context = 17;                            // Include search context fields: propertyNames, scores in the result set. Ignores the cypher_clause, and returns exactly the tuple { id(doc), [propertyName1, ..., propertyNameN], [score1,..., scoreN]} for each document
+	bool return_search_context = 17;                            // Include search context fields: `propertyNames`, `scores` in the result set. Returns exactly the tuple { id(doc), [propertyName1, ..., propertyNameN], [score1,..., scoreN]} for each document
+	TimeZone out_time_zone = 19;                                // Return `timestamp_offset` values in the specified time zone.
+	TimestampOffsetFormat out_timestamp_offset_format = 20;     // Indicates the method of encoding output `TimestampOffsetValues`.
+	DateOnlyFormat out_date_only_format = 21;                   // Indicates the method of encoding output `DateOnlyValues`.
+	TimeOnlyFormat out_time_only_format = 22;                   // Indicates the method of encoding output `TimeOnlyValues`.
+	DurationFormat out_duration_format = 23;                    // Indicates the method of encoding output `DurationValues`.
 }

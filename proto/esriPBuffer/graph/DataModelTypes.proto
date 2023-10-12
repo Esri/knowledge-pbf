@@ -27,6 +27,7 @@ enum GraphPropertyRole {
 	UNSPECIFIED = 0; // default
 	Regular = 1;
 
+	// Roles for Document entity type.
 	Document_Name = 2;
 	Document_Title = 3;
 	Document_Url = 4;
@@ -35,13 +36,20 @@ enum GraphPropertyRole {
 	Document_ContentType = 7;
 	Document_Metadata = 8;
 	Document_FileExtension = 9;
+
+	// Roles for Provenance entity type.
+	Provenance_InstanceId = 10;
+	Provenance_SourceType = 11;
+	Provenance_SourceName = 12;
+	Provenance_Source = 13;
+	Provenance_Comment = 14;
+	Provenance_TypeName = 15;
+	Provenance_PropertyName = 16;
 }
 
 enum esriGraphNamedObjectRole {
-	reserved 1;
-	reserved "esriGraphNamedObjectProvenance";
-
 	esriGraphNamedObjectRegular = 0; // default
+	esriGraphNamedObjectProvenance = 1;
 	esriGraphNamedObjectDocument = 2;
 }
 
@@ -71,7 +79,7 @@ message RelationshipType {
 	reserved "origin_entity_types", "dest_entity_types", "strict_origin", "strict_dest";
 
 	NamedObjectType relationship = 3;
-	repeated EndPoint observed_end_points = 6; // Endpoints in the RelationshipType definition may be out of sync with graph data.
+	repeated EndPoint observed_end_points = 6; // `Endpoints` in the RelationshipType definition may be out of sync with graph data.
 }
 
 message GraphProperty {
@@ -89,8 +97,8 @@ message GraphProperty {
 	bool required = 9;                          // by default props are not required
 	bool isSystemMaintained = 10;
 	string domain = 11;
-	bool hasZ = 13;                             // only applies if type is geometry
-	bool hasM = 14;                             // only applies if type is geometry
+	bool hasZ = 13;                             // only applies if type is `geometry`
+	bool hasM = 14;                             // only applies if type is `geometry`
 
 	oneof role_type {
 		GraphPropertyRole role = 16;
@@ -128,4 +136,17 @@ message IdentifierMappingInfo {
 message IdentifierInfo {
 	IdentifierMappingInfo mapping_info = 1;
 	IdentifierGenerationInfo generation_info = 2;
+}
+
+message SourceTypeValueBehavior {
+	// Valid values are `String`, `URL` and `Document`.
+	string behavior = 1;
+
+	// User-defined value for valid source type in a provenance record.
+	string value = 2;
+}
+
+message ProvenanceSourceTypeValues {
+	// Valid source type values for provenance records.
+	repeated SourceTypeValueBehavior value_behavior_array = 1;
 }

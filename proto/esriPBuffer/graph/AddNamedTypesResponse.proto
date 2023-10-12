@@ -29,7 +29,7 @@ message GraphNamedObjectTypeAddResult {
 }
 
 message GraphNamedObjectTypeAddsResponse {
-	Error error = 1; // to be used in case there was a non-entity/rel-specific reason for the failure.
+	Error error = 1; // High level error in case there is a non-entity or relationship specific reason for the failure.
 
 	repeated GraphNamedObjectTypeAddResult entity_add_results = 2;
 	repeated GraphNamedObjectTypeAddResult relationship_add_results = 3;

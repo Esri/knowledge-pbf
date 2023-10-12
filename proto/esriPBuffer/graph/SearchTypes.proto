@@ -31,5 +31,5 @@ message SearchIndex {
 
   string name = 1;                                            // The search index name
   esriNamedTypeCategory supported_category = 2;               // Indicates the level of support from the search index
-  map<string, SearchIndexProperties> search_properties = 4;   // The map of <typeName, propertyNames> making up the graph properties participating in the search index
+  map<string, SearchIndexProperties> search_properties = 4;   // The map of `<typeName, propertyNames>` making up the graph properties participating in the search index
 }

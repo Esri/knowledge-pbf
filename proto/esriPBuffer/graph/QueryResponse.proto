@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 syntax = "proto3";
 package esriPBuffer.graph;
 option java_package = "com.esri.arcgis.protobuf.graph";
@@ -24,9 +24,9 @@ import "esriPBuffer/graph/EsriGraphTypes.proto";
 // ../KnowledgeGraphServer/graph/query
 
 message GraphQueryResultHeader {
-	uint64 data_model_timestamp = 1; // UTC UNIX epoch in milliseconds
+	uint64 data_model_timestamp = 1;   // UTC UNIX epoch in milliseconds
 	Transform transform = 2;
-	Error error = 3; // optional
+	Error error = 3;                   // optional
 	repeated string field_names = 4;
 	bool compressed_frames = 5;
 }
@@ -39,6 +39,6 @@ message GraphQueryResultFrame {
 	Error error = 1; // optional
 	repeated GraphQueryRow rows = 2;
 
-	//exceeded_transfer_limit property can only be set on the last frame of the graph query response
+	// `exceeded_transfer_limit` property can only be set on the last frame of the graph query response.
 	bool exceeded_transfer_limit = 3;
 }

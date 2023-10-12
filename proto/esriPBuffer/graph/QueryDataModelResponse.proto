@@ -27,17 +27,19 @@ import "esriPBuffer/graph/SearchTypes.proto";
 
 message GraphDataModel {
 	reserved 9, 10, 11, 12, 13;
-	reserved "origin_entity_globalid_property", "dest_entity_globalid_property", "doc_entity_type_info", "prov_meta_entity_type_info", "meta_entity_types";
+	reserved "origin_entity_globalid_property", "dest_entity_globalid_property", "doc_entity_type_info", "prov_meta_entity_type_info";
 
 	uint64 data_model_timestamp = 1; // UTC UNIX epoch in milliseconds
 	EsriTypes.SpatialReference spatial_reference = 2;
 	repeated EsriTypes.Domain domains = 3;
 	repeated EntityType entity_types = 4;
 	repeated RelationshipType relationship_types = 5;
+	repeated EntityType meta_entity_types = 17;
 	bool strict = 6;
 	string objectid_property = 7;
 	string globalid_property = 8;
 	repeated SearchIndex search_indexes = 14;
 	IdentifierInfo identifier_info = 15;
 	bool arcgis_managed_data = 16;
+	ProvenanceSourceTypeValues provenance_source_type_values = 18;
 }

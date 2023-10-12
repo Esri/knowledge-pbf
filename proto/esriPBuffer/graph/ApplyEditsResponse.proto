@@ -32,10 +32,10 @@ message EditResults {
   reserved "oid_array", "globalid_array";
 
   // For every edit result K:
-  //   - errors[K] will hold the Error, if any
+  //   - `errors`[K] will hold the `Error`, if any
   //
   // If errors[K] is set, then:
-  //   - id_array[K] == null_tag or null equivalent of AnyValue
+  //   - `id_array`[K] == null_tag or null equivalent of `AnyValue`
 
   // indexed by position in `id_array`
   map<uint64, Error> errors = 3;
@@ -48,7 +48,7 @@ message CascadingRelationshipDeletes {
   reserved 2, 3;
   reserved "origin_entity_globalid_array", "dest_entity_globalid_array";
 
-  // EditResults for all relationships automatically deleted because they were connected to a deleted entity.
+  // `EditResults` for all relationships automatically deleted because they were connected to a deleted entity.
   EditResults relationship_delete_results = 1;
 
   // The array of origin entity unique identifiers.
@@ -56,6 +56,11 @@ message CascadingRelationshipDeletes {
 
   // The array of destination entity unique identifiers.
   ArrayValue dest_entity_id_array = 5;
+}
+
+message CascadingProvenanceDeletes {
+  // `EditResults` for all provenance records automatically deleted because they were sourced by a  deleted entity, relationship, or property value.
+  EditResults provenance_delete_results = 1;
 }
 
 message RelationshipTypeSchemaChanges {
@@ -68,21 +73,22 @@ message RelationshipTypeSchemaChanges {
 message GraphApplyEditsResult {
   Error error = 1; // High level error in case there was a non-entity/rel-specific reason for the failure.
 
-  // Grouped by named object type name
+  // Grouped by named object type name.
   map<string, EditResults> entity_add_results = 2;
   map<string, EditResults> relationship_add_results = 3;
 
-  // Grouped by named object type name
+  // Grouped by named object type name.
   map<string, EditResults> entity_update_results = 4;
   map<string, EditResults> relationship_update_results = 5;
 
-  // Grouped by named object type name
+  // Grouped by named object type name.
   map<string, EditResults> entity_delete_results = 6;
   map<string, EditResults> relationship_delete_results = 7;
 
-  // Grouped by relationship type name
+  // Grouped by relationship type name.
   map<string, CascadingRelationshipDeletes> cascading_relationship_delete_results = 8;
-
-  // Grouped by relationship type name
   map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
+
+  // Deleted provenance records due to the deletion of their source entity, relationship, or property-value.
+  CascadingProvenanceDeletes cascading_provenance_delete_results = 10;
 }
