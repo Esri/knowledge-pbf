@@ -93,6 +93,11 @@ message DurationArray {
 	repeated DurationValue value = 1;
 }
 
+// A note on the temporal types. The restrictions mentioned below are in place and enforced
+// for input in ApplyEdits. 
+// The Query pipeline output is not restricted, and valid `openCypher` queries may produce values
+// outside the restricted range. For example `RETURN date("0000-01-01") + duration("-P1D")`.
+
 message TimeZone {
 	// IANA Time Zone Database TZ identifier
 	//  i.e. Europe/Zurich, America/Los_Angeles, etc
