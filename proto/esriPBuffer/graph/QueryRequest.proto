@@ -21,8 +21,20 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/EsriTypes.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/graph/QueryTypes.proto";
 
 // ../KnowledgeGraphServer/graph/query
+
+enum ProvenanceBehavior {
+	// Default Behavior
+	// The query behaves as if there are no Provenance records in the graph, nor Provenance Entity Type defined in the data model.
+	//  - `arcgisManagedData` = `true` services return a parse error when Provenance is referenced.
+	//  - `arcgisManagedData` = `false` services consider Provenance as a non-existent type, and may return an empty result set.
+	EXCLUDE = 0;
+
+	// `open_cypher_query` can reference the Provenance Entity Type. The result set may return provenance records.
+	INCLUDE = 1;
+}
 
 message GraphQueryRequest {
 	string open_cypher_query = 1;
@@ -45,4 +57,14 @@ message GraphQueryRequest {
 
 	// Only applies to geometries sent by the client to the server
 	Transform input_transform = 8;
+
+	ProvenanceBehavior provenance_behavior = 9;
+
+	// Return `timestamp_offset` values in the specified time zone
+	TimeZone out_time_zone = 11;
+
+	TimestampOffsetFormat out_timestamp_offset_format = 10;
+	DateOnlyFormat out_date_only_format = 12;
+	TimeOnlyFormat out_time_only_format = 13;
+	DurationFormat out_duration_format = 14;
 }

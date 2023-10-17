@@ -35,5 +35,9 @@ enum FieldType {
 	esriFieldTypeGUID = 11;
 	esriFieldTypeGlobalID = 12;
 	esriFieldTypeXML = 13;
+	esriFieldTypeBigInteger = 14;
+	esriFieldTypeDateOnly = 15;
+	esriFieldTypeTimeOnly = 16;
+	esriFieldTypeTimestampOffset = 17;
 }
 

@@ -29,13 +29,13 @@ import "esriPBuffer/graph/GraphObjectIdentifierSet.proto";
 //
 
 message NamedObjectAdd {
-	reserved 1; // Used prior to 11.1 for map-based KeyValuePair representation.
+	reserved 1; // Used prior to 11.1 for map-based `KeyValuePair` representation.
 
-	// arcGISManagedData: true services will generate the objectid when not included in the properties map.
+	// `arcgisManagedData`: `true` services will generate the objectid when not included in the `properties` map.
 	repeated KeyValuePair properties = 2;
 
 	// When the unique id value is not provided, the system will generate the unique identifier value using the id generation hint in
-	// idMappingInfo of the service as described in the data model. If the system is unable to generate a unique id, the ApplyEdits request will fail.
+	// `idMappingInfo` of the service as described in the data model. If the system is unable to generate a unique id, the ApplyEdits request will fail.
 	AnyValue id = 3;
 }
 
@@ -58,10 +58,10 @@ message RelationshipAdds {
 }
 
 message Adds {
-	// entity adds grouped by entity type name
+	// Entity adds grouped by entity type name.
 	map<string, EntityAdds> entities = 1;
 
-	// relationship adds grouped by relationship type name
+	// Relationship adds grouped by relationship type name.
 	map<string, RelationshipAdds> relationships = 2;
 }
 
@@ -69,12 +69,12 @@ message NamedObjectUpdate {
 	reserved 1, 2, 3; // Used before 11.1
 	reserved "oid", "globalid";
 
-	// unique ID of the NamedObject. This could be either globalID, database native ID or user defined unique ID
+	// Unique ID of the `NamedObject`. This could be either globalid, database native ID or user defined unique ID.
 	oneof id {
 		AnyValue update_id = 4;
 	}
 
-	// properties map does not need to include identifiers (i.e unique identifier, objectid, globalid).
+	// Properties map does not need to include identifiers (i.e unique identifier, objectid, globalid).
 	repeated KeyValuePair properties = 5;
 }
 
@@ -83,18 +83,18 @@ message NamedObjectUpdates {
 }
 
 message Updates {
-	// entity updates grouped by entity type name
+	// Entity updates grouped by entity type name.
 	map<string, NamedObjectUpdates> entities = 1;
 
-	// relationship updates grouped by relationship type name
+	// Relationship updates grouped by relationship type name.
 	map<string, NamedObjectUpdates> relationships = 2;
 }
 
 message Deletes {
-	// entity ID arrays grouped by entity type name
+	// Entity ID arrays grouped by entity type name.
 	map<string, GraphObjectIdentifierSet> deleted_entity_ids = 1;
 
-	// relationship ID arrays grouped by relationship type name
+	// Relationship ID arrays grouped by relationship type name.
 	map<string, GraphObjectIdentifierSet> deleted_relationship_ids = 2;
 }
 
@@ -109,14 +109,20 @@ message GraphApplyEditsHeader {
 
 	EsriTypes.SpatialReference spatialReference = 1;
 
-	// Set cascade_delete to True to automatically delete all relationships connected to an entity prior to deleting the entity.
-	// Set cascade_delete to False to enforce clients provide both entities and their connected relationships for deletion.
+	// Set `cascade_delete` to `true` to automatically delete all relationships connected to an entity prior to deleting the entity.
+	// Set `cascade_delete` to `false` to enforce clients provide both entities and their connected relationships for deletion.
 	// When connected relationships are not provided, the ApplyEdits operation will fail.
-	// default value of cascade_delete is false.
+	// default value of `cascade_delete` is `false`.
 	bool cascade_delete = 3;
 
 	// Only applies to geometries sent by the client to the server.
 	Transform input_transform = 4;
+
+	// Set `cascade_delete_provenance` to `true` to automatically delete all provenance records associated to deleted entities, relationships or property values.
+	// Set `cascade_delete_provenance` to `false` to enforce clients to provide provenance records associated to deleted entities, relationships or property values.
+	// When associated provenance records are not provided, the ApplyEdits operation will fail.
+	// The default value of `cascade_delete_provenance` is `false`.
+	bool cascade_delete_provenance = 5;
 }
 
 message GraphApplyEditsFrame {

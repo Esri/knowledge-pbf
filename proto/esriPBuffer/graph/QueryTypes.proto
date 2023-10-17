@@ -1,0 +1,66 @@
+﻿/* Copyright 2023 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+enum TimestampOffsetFormat {
+	// Default
+	// Returns `TimestampOffsetValues` as `sint64` in a count of milliseconds since UNIX epoch & time offset.
+	// This is the optimized `TimestampOffsetValue` format. The other formats are provided as a convenience to clients with a performance cost.
+	TS_FORMAT_EPOCH_MS = 0;
+
+	// Returns `TimestampOffsetValues` as a `DateTimeComponent` & time offset.
+	TS_FORMAT_DATE_TIME_COMPONENTS = 1;
+
+	// Return `TimestampOffsetValues` as an ISO8601 String.
+	TS_FORMAT_ISO_8601_STRING = 2;
+}
+
+enum DateOnlyFormat {
+	// Default
+	// Returns the `DateOnlyValue` as `sint32` in a count of days since UNIX epoch.
+	DATE_FORMAT_DATE_ONLY_EPOCH_DAY = 0;
+
+	// Returns `DateOnlyValues` as a `DateOnlyComponent`.
+	DATE_FORMAT_DATE_ONLY_COMPONENTS = 1;
+
+	// Returns `DateOnlyValues` as an ISO8601 String.
+	DATE_FORMAT_ISO_8601_STRING = 2;
+}
+
+enum TimeOnlyFormat {
+	// Default
+	// Returns the `TimeOnlyValue` as `uint32` in a count of milliseconds since midnight.
+	TIME_FORMAT_MILLISECONDS_OF_DAY = 0;
+
+	// Returns `TimeOnlyValues` as a `TimeOnlyComponent`.
+	TIME_FORMAT_TIME_ONLY_COMPONENTS = 1;
+
+	// Returns `TimeOnlyValues` as an ISO8601 String.
+	TIME_FORMAT_ISO_8601_STRING = 2;
+}
+
+enum DurationFormat {
+	// Default
+	// Returns `DurationValues` as a `DurationComponent`.
+	DURATION_FORMAT_DURATION_COMPONENTS = 0;
+
+	// Returns `DurationValues` as an ISO8601 String.
+	DURATION_FORMAT_ISO_8601_STRING = 1;
+}

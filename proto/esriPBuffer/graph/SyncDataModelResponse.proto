@@ -24,10 +24,14 @@ import "esriPBuffer/graph/EsriGraphTypes.proto";
 // ../KnowledgeGraphServer/dataModel/syncDataModel
 
 message SyncDataModelResponse {
-  Error error = 1; // High level error in case there was an error prior to synchronization of data model during discovery phase.
+  // High level error in case there is an error prior to synchronization of data model during discovery phase.
+  Error error = 1;
 
-  // Grouped by named object type name
-  // named types are only populated when a failure or warning is logged.
+  // High level warnings in case there are privilege access issues during discovery of the graph schema prior to synchronization of the data model.
+  repeated Error warnings = 4;
+
+  // Grouped by entity or relationship type name
+  // Entity and  relationship type names are populated when a failure or warning is logged.
   repeated SyncDataModelResult named_type_sync_results = 2;
 }
 
