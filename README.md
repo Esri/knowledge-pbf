@@ -174,6 +174,12 @@ If streaming, the http response header will indicate the response is streaming b
 #### Empty Result Frames (AKA: Heart Beat)
 If streaming, clients should expect to receive empty result frames (GraphQueryResultFrame with 0 rows). Empty result frames are written in response stream to keep the http connection alive while server is busy querying the next row. An empty result frame does not indicate end of streaming instead client must continue to read the stream until they receive a null result frame. 
 
+#### Error Handling
+A `GET` request packages all rows into a single result frame up to the max number of rows as indicated by the service definition property `maxRecordCount`. 
+A `POST` request does not guarantee the number of rows packaged in a result frame, and may be 0..N rows.
+
+When an error occurs while processing rows, the `Error error` parameter of the result frame will be set, and no more rows will be processed. That is we short-circuit processing once we encounter an error condition. The ensuing result frame includes rows processed before the error and the error itself.
+
 ---
 ## How to execute an apply edits request
 The Knowledge Graph Service `applyEdits` REST end point is located under the graph resource:
