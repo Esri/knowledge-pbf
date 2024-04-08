@@ -1,0 +1,67 @@
+/* Copyright 2024 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/DataModelTypes.proto";
+
+// ../rest/admin/../KnowledgeGraphServer/dataModel/constraintRules/update
+
+message ConstraintRuleMask {
+  bool update_name = 1;
+  bool update_alias = 2;
+  bool update_disabled = 3;
+}
+
+// A set of named types cannot be updated to change which `oneof type_of_set`
+// element it uses. If `set_complement` is specified, then `add_named_types`
+// will add named types to the complement of the set (hence removing named
+// types from the specified set), and `remove_named_types` will remove named
+// types from the complement of the set (hence adding named types to the
+// specified set). If `set` is specified, then `add_named_types` will simply
+// add named types to the set and `remove_named_types` will remove named types
+// from the set. Removing all named types when `set_complement` is specified
+// means the set of named types includes all named types; removing all named
+// types when `set` is specified means the set of named types includes no named
+// types.
+message UpdateSetOfNamedTypes {
+  repeated string add_named_types = 1;
+  repeated string remove_named_types = 2;
+}
+
+message GraphRelationshipExclusionRuleUpdate {
+  UpdateSetOfNamedTypes update_origin_entity_types = 1;
+  UpdateSetOfNamedTypes update_relationship_types = 2;
+  UpdateSetOfNamedTypes update_destination_entity_types = 3;
+}
+
+message GraphConstraintRuleUpdate {
+  // Each `rule_name` in the request must be unique.
+  string rule_name = 1;
+  ConstraintRuleMask mask = 2;
+  ConstraintRule constraint_rule = 3;
+  
+  oneof update_constraint_rule_type {
+    GraphRelationshipExclusionRuleUpdate relationship_exclusion_rule_update = 4;
+  }
+}
+
+message GraphConstraintRuleUpdatesRequest {
+  repeated GraphConstraintRuleUpdate constraint_rule_updates = 1;
+}

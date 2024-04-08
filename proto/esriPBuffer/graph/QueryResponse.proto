@@ -1,4 +1,4 @@
-﻿/* Copyright 2023 Esri
+﻿/* Copyright 2024 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ option java_package = "com.esri.arcgis.protobuf.graph";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
+import "esriPBuffer/EsriTypes.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
 // ../KnowledgeGraphServer/graph/query
@@ -29,6 +30,7 @@ message GraphQueryResultHeader {
 	Error error = 3;                   // optional
 	repeated string field_names = 4;
 	bool compressed_frames = 5;
+	EsriTypes.SpatialReference sr = 6; // spatial reference of the returned geometries
 }
 
 message GraphQueryRow {

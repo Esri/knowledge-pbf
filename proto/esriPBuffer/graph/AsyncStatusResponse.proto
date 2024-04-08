@@ -1,0 +1,58 @@
+/* Copyright 2024 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+
+// ../KnowledgeGraphServer/jobs/status/<job-id>
+
+message AsyncStatusResponse {
+	AsyncStatusType async_status = 1;
+
+	// Populated when the `async_status` is `ASYNC_STATUS_COMPLETED`.
+	// URL is of the form: `../KnowledgeGraphServer/jobs/results/<job-id>`
+	string results_url = 2;
+
+	// start time of the async operation. UTC UNIX epoch in milliseconds.
+	uint64 submission_time = 3;
+
+	// The time the async operation was last updated based on the internal progress. UTC UNIX epoch in milliseconds.
+	uint64 last_updated_time = 4;
+	ProgressStatus progress_status = 5;
+}
+
+enum AsyncStatusType {
+	ASYNC_STATUS_UNSPECIFIED = 0;
+
+	// The `results_url` in `AsyncStatusResponse` is populated when the status is `ASYNC_STATUS_COMPLETED`.
+	ASYNC_STATUS_COMPLETED = 1;
+	ASYNC_STATUS_EXECUTING = 2;
+	ASYNC_STATUS_CANCELLING = 3;
+	ASYNC_STATUS_CANCELLED = 4;
+	ASYNC_STATUS_FAILED = 5;
+
+	// The status is `UNAVAILABLE` when the `<jobid>` does not exist, or the job is expired.
+	// This may happen when the job results expire and are no longer available.
+	ASYNC_STATUS_UNAVAILABLE = 6;
+}
+
+message ProgressStatus {
+	int64 code = 1;
+	string message = 2;
+}
