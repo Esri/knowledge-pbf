@@ -79,7 +79,7 @@ message RelationshipType {
 	reserved "origin_entity_types", "dest_entity_types", "strict_origin", "strict_dest";
 
 	NamedObjectType relationship = 3;
-	repeated EndPoint observed_end_points = 6; // `Endpoints` in the 1RelationshipType1 definition may be out of sync with graph data.
+	repeated EndPoint observed_end_points = 6; // `Endpoints` in the `RelationshipType` definition may be out of sync with graph data.
 }
 
 message GraphProperty {
