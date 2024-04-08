@@ -198,3 +198,4 @@ message ConstraintRule {
 	oneof constraint_rule_type {
 		RelationshipExclusionRule relationship_exclusion_rule = 5;
 	}
+}

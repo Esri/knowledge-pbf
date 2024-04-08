@@ -1,0 +1,45 @@
+﻿/* Copyright 2024 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/ClientDataTypes.proto";
+
+// ../KnowledgeGraphServer/clientData/fetch
+
+message ClientDataFetchRequestParameter {
+	ClientDataKey key = 1;
+	optional ClientDataVTag v_tag = 2;
+}
+
+// The `ClientDataFetchRequest` is the message to be used in the body of fetch operations on the clientData resource.
+//
+// # High Level Errors
+//
+// Duplicate keys in the request will be rejected by the server and results in a high-level error in the response body.
+//
+// # Individual Client Data Response Behavior
+//
+// - If the `ClientDataKey` is not present, an individual error for the specified key will be included in the response.
+// - When `v_tag` is not set, the response includes both the current `v_tag` and `value`.
+// - When `v_tag` is set in the request, but does not match the persisted `v_tag`, the response includes both `v_tag` and `value`.
+// - When `v_tag` is set in the request and matches the persisted `v_tag`, the response includes the `v_tag` and the `NotModified` message.
+message ClientDataFetchRequest {
+	repeated ClientDataFetchRequestParameter fetch_client_data = 1;
+}
