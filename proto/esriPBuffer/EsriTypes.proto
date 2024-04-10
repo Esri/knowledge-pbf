@@ -106,6 +106,7 @@ message EsriTypes {
 			uint32 latestVcsWkid = 4;
 			string wkt = 5;
 			uint32 sdesrid = 6;
+			string wkt2 = 7;
 		}
 
 		message FieldIndex {
@@ -171,5 +172,6 @@ message EsriTypes {
 			string transformJson = 4;
 			SpatialReference fromSR = 5;
 			SpatialReference toSR = 6;
+			string wkt2 = 7;
 		}
 }
