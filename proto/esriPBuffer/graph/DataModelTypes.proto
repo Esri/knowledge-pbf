@@ -1,4 +1,4 @@
-﻿/* Copyright 2023 Esri
+﻿/* Copyright 2024 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ message RelationshipType {
 	reserved "origin_entity_types", "dest_entity_types", "strict_origin", "strict_dest";
 
 	NamedObjectType relationship = 3;
-	repeated EndPoint observed_end_points = 6; // `Endpoints` in the RelationshipType definition may be out of sync with graph data.
+	repeated EndPoint observed_end_points = 6; // `Endpoints` in the `RelationshipType` definition may be out of sync with graph data.
 }
 
 message GraphProperty {
@@ -91,10 +91,10 @@ message GraphProperty {
 	EsriExtendedTypes.FieldType fieldType = 3;
 	EsriTypes.GeometryType geometryType = 4;    // not present if property is not of type `geometry`
 	repeated PrimitiveValue defaultValue = 5;   // may be more than 1 for arrays
-	bool not_nullable = 6;                      // by default props are nullable
-	bool not_editable = 7;                      // by default props are editable
-	bool not_visible = 8;                       // by default props are visible
-	bool required = 9;                          // by default props are not required
+	bool not_nullable = 6;                      // by default graph properties are nullable
+	bool not_editable = 7;                      // by default graph properties are editable
+	bool not_visible = 8;                       // by default graph properties are visible
+	bool required = 9;                          // by default graph properties are not required
 	bool isSystemMaintained = 10;
 	string domain = 11;
 	bool hasZ = 13;                             // only applies if type is `geometry`
@@ -149,4 +149,53 @@ message SourceTypeValueBehavior {
 message ProvenanceSourceTypeValues {
 	// Valid source type values for provenance records.
 	repeated SourceTypeValueBehavior value_behavior_array = 1;
+}
+
+// An empty array for `set` indicates the empty set. An empty array for
+// `set_complement` indicates the set of all named types.
+message SetOfNamedTypes {
+	oneof type_of_set {
+		StringArray set = 1;            // Members of the set.
+		StringArray set_complement = 2; // Members of the complement of the set.
+	}
+}
+
+// A relationship exclusion rule consists of a set of origin entity types, a
+// set of relationship types, and a set of destination entity types. A
+// relationship instance matches the pattern specified by the rule
+// if the origin entity's type is contained in the set of origin entity types,
+// the relationship's type is contained in the set of relationship types, and
+// the destination entity's type is contained in the set of destination entity
+// types. A relationship exclusion rule mandates that a relationship instance
+// must not match the pattern specified by the rule.
+message RelationshipExclusionRule {
+	SetOfNamedTypes origin_entity_types = 1;
+	SetOfNamedTypes relationship_types = 2;
+	SetOfNamedTypes destination_entity_types = 3;
+}
+
+// The role of the constraint rule. User-defined constraint rules must have
+// role `ConstraintRuleRole_Regular`. The other roles pertain to
+// system-maintained constraint rules.
+enum ConstraintRuleRole {
+	ConstraintRuleRole_UNSPECIFIED = 0; // default
+	ConstraintRuleRole_Regular = 1;
+
+	// Roles pertaining to system-maintained relationship exclusion rules.
+	RelationshipExclusion_HasDocument = 2;
+	RelationshipExclusion_NoProvenanceOrigin = 3;
+	RelationshipExclusion_NoProvenanceDestination = 4;
+}
+
+// When enabled, constraint rules are applied to entity or relationship
+// instances during ApplyEdits.
+message ConstraintRule {
+	string name = 1;
+	string alias = 2;
+	bool disabled = 3;
+	ConstraintRuleRole role = 4;
+
+	oneof constraint_rule_type {
+		RelationshipExclusionRule relationship_exclusion_rule = 5;
+	}
 }

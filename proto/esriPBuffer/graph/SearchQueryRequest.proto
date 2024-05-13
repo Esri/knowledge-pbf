@@ -1,4 +1,4 @@
-﻿/* Copyright 2023 Esri
+﻿/* Copyright 2024 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ message GraphSearchRequest {
 	EsriTypes.esriSpatialRel spatial_relation = 8;              // The spatial relationship to be applied to the input geometry. Defaults to `esriSpatialRelIntersects`.
 
 	// Output Geometry Parameters
-	bool return_geometry = 9;                                   // A flag to indicate whether the search results include geometry.
+	bool return_geometry = 9 [deprecated = true];               // Parameter is ignored and marked for deprecation to be replaced by more granular result set filter options in a future release.
 	EsriTypes.esriFeatureEncoding feature_encoding = 10;        // Enumeration indicating the method of encoding return geometries.
 	EsriTypes.SpatialReference out_spat_ref = 11;               // The output spatial reference of the return geometries.
 	EsriTypes.DatumTransformation datum_transform = 12;         // The transformation to apply to the return geometries.

@@ -55,3 +55,8 @@ message ObjectIdentifierSet {
 		IdentifierArray identifier_array = 4;
 	}
 }
+
+message MapOfObjectIdentifierSets {
+	// The key is an Entity or Relationship Type name. The value is an ID inclusion set.
+	map<string, ObjectIdentifierSet> map_of_identifier_sets = 1;
+}

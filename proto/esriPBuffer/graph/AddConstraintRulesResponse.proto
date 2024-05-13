@@ -1,0 +1,36 @@
+﻿/* Copyright 2024 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+
+// ../rest/admin/../KnowledgeGraphServer/dataModel/constraintRules/add
+
+message GraphConstraintRuleAddResult {
+	string name = 1;
+	Error error = 2;
+	repeated Error warnings = 3;
+}
+
+message GraphConstraintRuleAddsResponse {
+	Error error = 1; // to be used in case there was a non-constraint-rule-specific reason for the failure.
+
+	repeated GraphConstraintRuleAddResult constraint_rule_add_results = 2;
+}

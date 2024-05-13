@@ -1,4 +1,4 @@
-﻿/* Copyright 2023 Esri
+﻿/* Copyright 2024 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,14 @@ message SyncDataModelResponse {
   // Grouped by entity or relationship type name
   // Entity and  relationship type names are populated when a failure or warning is logged.
   repeated SyncDataModelResult named_type_sync_results = 2;
+
+  // Populated when `async` is `true` on the `SyncDataModelRequest`.
+  // Clients are expected to poll the `async_status_url` for status of the asynchronous job.
+  string async_status_url = 3;
+
+  // Timestamp to indicate the last moment the data model was updated. UTC UNIX epoch in milliseconds.
+  // Clients can compare the value given with the local cached data model and refresh as necessary.
+  uint64 data_model_timestamp = 5;
 }
 
 message SyncDataModelResult {
