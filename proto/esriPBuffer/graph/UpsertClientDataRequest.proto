@@ -24,9 +24,9 @@ import "esriPBuffer/graph/ClientDataTypes.proto";
 // ../KnowledgeGraphServer/clientData/upsert
 
 message ClientDataUpsertRequestParameter {
-	ClientDataKey key = 1;
-	ClientData value = 2;
-	optional ClientDataVTag v_tag = 3;
+  ClientDataKey key = 1;
+  ClientData value = 2;
+  optional ClientDataVTag v_tag = 3;
 }
 
 // If there are duplicate keys in the request, reject the entire request and send an error response.
@@ -38,5 +38,5 @@ message ClientDataUpsertRequestParameter {
 // If there are errors during upsert for some keys/values, other valid client data in the request still pass through
 // and get stored successfully in the database (there is no global rollback).
 message ClientDataUpsertRequest {
-	repeated ClientDataUpsertRequestParameter upsert_client_data = 1;
+  repeated ClientDataUpsertRequestParameter upsert_client_data = 1;
 }
