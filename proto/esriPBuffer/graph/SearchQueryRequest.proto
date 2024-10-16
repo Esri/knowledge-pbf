@@ -52,7 +52,7 @@ message GraphSearchRequest {
 	// Search Result Set Options
 	sint32 start_index = 15;                                    // The index of the first result to return.
 	sint32 max_num_results = 16;                                // The maximum number results to return.
-	bool return_search_context = 17;                            // Include search context fields: `propertyNames`, `scores` in the result set. Returns exactly the tuple { id(doc), [propertyName1, ..., propertyNameN], [score1,..., scoreN]} for each document
+	bool return_search_context = 17;                            // Include search context fields: `propertyNames`, `scores`, `typeCategory` & `typeName` in the result set. Returns exactly the tuple { id(doc), [propertyName1, ..., propertyNameN], [score1,..., scoreN], typeCategoryOf(doc), typeNameOf(doc)} for each document.
 	TimeZone out_time_zone = 19;                                // Return `timestamp_offset` values in the specified time zone.
 	TimestampOffsetFormat out_timestamp_offset_format = 20;     // Indicates the method of encoding output `TimestampOffsetValues`.
 	DateOnlyFormat out_date_only_format = 21;                   // Indicates the method of encoding output `DateOnlyValues`.

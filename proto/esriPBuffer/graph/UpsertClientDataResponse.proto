@@ -35,6 +35,6 @@ message ClientDataUpsertResult {
 
 message ClientDataUpsertResponse  {
   Error error = 1;  // Error that pertain to the entire request. When this error is set, upsert_results will be empty.
-  
+
   repeated ClientDataUpsertResult upsert_results = 2;
 }
