@@ -205,3 +205,18 @@ message ConstraintRule {
 		RelationshipExclusionRule relationship_exclusion_rule = 5;
 	}
 }
+
+message EditorTrackingInfo {
+	EditorTrackingSchema editor_tracking_schema = 1;
+}
+
+message EditorTrackingSchema {
+	string creator_property = 1;
+	string create_date_property = 2;
+	string editor_property = 3;
+	string edit_date_property = 4;
+	string creator_property_alias = 5;
+	string create_date_property_alias = 6;
+	string editor_property_alias = 7;
+	string edit_date_property_alias = 8;
+}
