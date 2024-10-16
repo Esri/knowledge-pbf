@@ -129,7 +129,80 @@ message EsriTypes {
 				uint64 uint64_value = 7;
 				sint64 sint64_value = 8;
 				bool bool_value = 9;
+				bool null_value = 10;
 			}
+			// This index represents the position of the field that this value is associated with in a list of field names.
+			// It is currently used for mapping to the field name list present in LayerEdits.LayerEdit message
+			optional uint32 index = 11;
+		}
+
+		message Geometry {
+				GeometryType geometryType = 1;
+				repeated uint32 lengths = 2 [packed = true];// coordinate structure in lengths
+				repeated sint64 coords = 3 [packed = true]; // delta-encoded integer values
+				repeated sint32 ids = 4 [packed = true]; // vertex ids
+		}
+
+ 		message CurveGeometry {
+			GeometryType         geometryType = 1;
+ 			repeated uint32      parts = 2;
+			repeated SegmentSet  segmentSets = 3;
+			repeated sint64      coords = 4  [packed = true];
+ 		}
+
+	 	message SegmentSet {
+			SegmentType 	type = 1;
+			uint32      	    count = 2;
+			repeated double	    parameters = 3;
+		}
+
+		message esriShapeBuffer {
+				bytes bytes = 1;
+		}
+
+		message Feature {
+				repeated Value attributes = 1;
+				oneof compressed_geometry {
+					Geometry geometry = 2;
+					esriShapeBuffer shapeBuffer = 3;
+  				        CurveGeometry curveGeometry = 7;
+				}
+				Geometry centroid = 4;
+		}
+
+		message Attachment {
+			string name = 1;
+			uint64 size = 2;
+			uint64 attachmentId = 3;
+			string keyWords = 4;
+			string globalId = 5;
+			string parentGlobalId = 6;
+			uint64 parentObjectId = 7;
+			string contentType = 8;
+			string uploadId = 9;
+			string data = 10;
+		}
+
+		message UniqueIdField {
+			string name = 1;
+			bool isSystemMaintained = 2;
+			EsriTypes.UniqueIdField uniqueIdField = 3;
+		}
+
+		message GeometryProperties {
+			string shapeAreaFieldName = 1;
+			string shapeLengthFieldName = 2;
+			string units = 3;
+		}
+
+		message ServerGens {
+			uint64 minServerGen = 1;
+			uint64 serverGen = 2;
+			uint64 serverSibGen = 3;
+		}
+
+		message GeometryField {
+			string Name = 1;
 		}
 
 		message Envelope {
@@ -138,6 +211,10 @@ message EsriTypes {
 			double XMax = 3;
 			double YMax = 4;
 			SpatialReference SpatialReference = 5;
+			optional double ZMin = 6;
+			optional double MMin = 7;
+			optional double ZMax = 8;
+			optional double MMax = 9;
 		}
 
 		message CodedValue {

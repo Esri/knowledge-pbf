@@ -43,4 +43,5 @@ message GraphDataModel {
 	bool arcgis_managed_data = 16;
 	ProvenanceSourceTypeValues provenance_source_type_values = 18;
 	repeated ConstraintRule constraint_rules = 19;
+	EditorTrackingInfo editor_tracking_info = 20;
 }

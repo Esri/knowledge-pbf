@@ -21,7 +21,7 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
-// ../KnowledgeGraphServer/dataModel/domains/domainName/update
+// ../KnowledgeGraphServer/dataModel/domains/<domainName>/update
 
 message GraphDomainUpdateResponse {
 	Error error = 1;

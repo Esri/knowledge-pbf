@@ -25,16 +25,16 @@ import "esriPBuffer/graph/ClientDataTypes.proto";
 // ../KnowledgeGraphServer/clientData/upsert
 
 message ClientDataUpsertResult {
-  ClientDataKey key = 1;
+	ClientDataKey key = 1;
 
-  oneof upsert_result {
-    Error error = 2;           // error (or)
-    ClientDataVTag v_tag = 3;  // v_tag
-  }
+	oneof upsert_result {
+		Error error = 2;           // error (or)
+		ClientDataVTag v_tag = 3;  // v_tag
+	}
 }
 
 message ClientDataUpsertResponse  {
-  Error error = 1;  // Error that pertain to the entire request. When this error is set, upsert_results will be empty.
-  
-  repeated ClientDataUpsertResult upsert_results = 2;
+	Error error = 1;  // Error that pertain to the entire request. When this error is set, upsert_results will be empty.
+
+	repeated ClientDataUpsertResult upsert_results = 2;
 }

@@ -45,6 +45,12 @@ enum GraphPropertyRole {
 	Provenance_Comment = 14;
 	Provenance_TypeName = 15;
 	Provenance_PropertyName = 16;
+
+	// Roles for Editor Tracking properties.
+	EditorTracking_Creator = 17;
+	EditorTracking_CreateDate = 18;
+	EditorTracking_Editor = 19;
+	EditorTracking_EditDate = 20;
 }
 
 enum esriGraphNamedObjectRole {
