@@ -49,7 +49,7 @@ message GraphQueryRequest {
 	//    - relationship values
 	map<string, AnyValue> parameters = 2;
 
-    // Applies to output geometries
+	// Applies to output geometries
 	EsriTypes.esriFeatureEncoding feature_encoding = 3;
 	EsriTypes.SpatialReference out_sr = 4;
 	EsriTypes.DatumTransformation datum_transformation = 5;

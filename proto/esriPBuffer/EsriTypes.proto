@@ -129,7 +129,11 @@ message EsriTypes {
 				uint64 uint64_value = 7;
 				sint64 sint64_value = 8;
 				bool bool_value = 9;
+				bool null_value = 10;
 			}
+			// This index represents the position of the field that this value is associated with in a list of field names.
+			// It is currently used for mapping to the field name list present in LayerEdits.LayerEdit message
+			optional uint32 index = 11;
 		}
 
 		message Envelope {
@@ -138,6 +142,10 @@ message EsriTypes {
 			double XMax = 3;
 			double YMax = 4;
 			SpatialReference SpatialReference = 5;
+			optional double ZMin = 6;
+			optional double MMin = 7;
+			optional double ZMax = 8;
+			optional double MMax = 9;
 		}
 
 		message CodedValue {

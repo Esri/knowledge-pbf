@@ -253,7 +253,8 @@ message PrimitiveValue {
 		GeometryValue geometry_value = 11;
 
 		bool null_tag = 12; // MUST ALWAYS be set to `false`
-		int64 datetime_value = 13; // UTC UNIX timestamp in milliseconds.
+
+		int64 datetime_value = 13; // UTC UNIX timestamp in milliseconds since epoch.
 		TimestampOffsetValue timestamp_offset_value = 14;
 		DateOnlyValue date_only_value = 15;
 		TimeOnlyValue time_only_value = 16;

@@ -29,7 +29,7 @@ message AsyncStatusResponse {
 	// URL is of the form: `../KnowledgeGraphServer/jobs/results/<job-id>`
 	string results_url = 2;
 
-	// start time of the async operation. UTC UNIX epoch in milliseconds.
+	// Start time of the async operation. UTC UNIX epoch in milliseconds.
 	uint64 submission_time = 3;
 
 	// The time the async operation was last updated based on the internal progress. UTC UNIX epoch in milliseconds.
@@ -40,7 +40,7 @@ message AsyncStatusResponse {
 enum AsyncStatusType {
 	ASYNC_STATUS_UNSPECIFIED = 0;
 
-	// The `results_url` in `AsyncStatusResponse` is populated when the status is `ASYNC_STATUS_COMPLETED`.
+	// The `result_url` in `AsyncStatusResponse` is populated when the status is `ASYNC_STATUS_COMPLETED`.
 	ASYNC_STATUS_COMPLETED = 1;
 	ASYNC_STATUS_EXECUTING = 2;
 	ASYNC_STATUS_CANCELLING = 3;
