@@ -1,5 +1,5 @@
 
-<# Copyright 2023 Esri
+<# Copyright 2025 Esri
  #
  # Licensed under the Apache License Version 2.0 (the "License");
  # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  #>
  
 $compiler_path = "bin\protoc.exe"
-$runtime_ver = "3.21.12"
+$runtime_ver = "25.5"
 $proto_folder = Get-Item ".\proto"
 
 # C++
@@ -43,21 +43,11 @@ function Compare-Versions($lhs,$rhs)
 	if ($lhs.Contains("-")) { $lhs = $lhs.Split('-')[0] }
 	if ($rhs.Contains("-")) { $rhs = $rhs.Split('-')[0] }
 
-	$lhs_major = [int]$lhs.Split('.')[0]
-	$lhs_minor = [int]$lhs.Split('.')[1]
-	$lhs_patch = [int]$lhs.Split('.')[2]
+	$lhs_minor = [int]$lhs.Split('.')[0]
+	$lhs_patch = [int]$lhs.Split('.')[1]
 
-	$rhs_major = [int]$rhs.Split('.')[0]
-	$rhs_minor = [int]$rhs.Split('.')[1]
-	$rhs_patch = [int]$rhs.Split('.')[2]
-
-	if ($lhs_major -gt $rhs_major) {
-		return -3
-	}
-
-	if ($lhs_major -lt $rhs_major) {
-		return 3
-	}
+	$rhs_minor = [int]$rhs.Split('.')[0]
+	$rhs_patch = [int]$rhs.Split('.')[1]
 
 	if ($lhs_minor -gt $rhs_minor) {
 		return -2
@@ -157,11 +147,6 @@ function Validate-Protoc-Version()
     {
         throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") is higher than server runtime version ("+ $runtime_ver + "). Please update protobuf compiler version!")
     }
-
-
-    if (($ver_comp -eq -3) -or ($ver_comp -eq 3)) {
-		throw ("CRITICAL ERROR! Protocol Buffer compiler version ("+ $protoc_ver +") has a different major version than the server runtime ("+ $runtime_ver +")")
-	}
 }
 
 function Invoke-Compiler($includes, $out_path_arg, $out_path, $protoFiles)

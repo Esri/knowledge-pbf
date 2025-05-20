@@ -168,11 +168,11 @@ message SetOfNamedTypes {
 
 // A relationship exclusion rule consists of a set of origin entity types, a
 // set of relationship types, and a set of destination entity types. A
-// relationship instance matches the pattern specified by the rule
+// relationship matches the pattern specified by the rule
 // if the origin entity's type is contained in the set of origin entity types,
 // the relationship's type is contained in the set of relationship types, and
 // the destination entity's type is contained in the set of destination entity
-// types. A relationship exclusion rule mandates that a relationship instance
+// types. A relationship exclusion rule mandates that a relationship
 // must not match the pattern specified by the rule.
 message RelationshipExclusionRule {
 	SetOfNamedTypes origin_entity_types = 1;
@@ -193,8 +193,8 @@ enum ConstraintRuleRole {
 	RelationshipExclusion_NoProvenanceDestination = 4;
 }
 
-// When enabled, constraint rules are applied to entity or relationship
-// instances during ApplyEdits.
+// When enabled, constraint rules are applied to entities or relationships
+// during ApplyEdits.
 message ConstraintRule {
 	string name = 1;
 	string alias = 2;

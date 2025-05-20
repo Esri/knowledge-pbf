@@ -30,6 +30,7 @@ message AsyncResultResponse {
 	uint64 submission_time = 2;
 	// end time of the async operation. UTC UNIX epoch in milliseconds.
 	uint64 completion_time = 3;
+
 	oneof operation_response {
 		SyncDataModelResponse sync_data_model_response = 4;
 	}

@@ -91,4 +91,13 @@ message GraphApplyEditsResult {
 
   // Deleted provenance records due to the deletion of their source entity, relationship, or property-value.
   CascadingProvenanceDeletes cascading_provenance_delete_results = 10;
+
+  // portal username and the timestamp when the operation was performed
+  ApplyEditsMetadata apply_edits_metadata = 11;
+}
+
+message ApplyEditsMetadata {
+  string user_name = 1;
+  // UTC UNIX timestamp in milliseconds since epoch.
+  uint64 timestamp = 2;
 }
