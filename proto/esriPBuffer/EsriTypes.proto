@@ -22,164 +22,164 @@ option cc_enable_arenas = true;
 import "esriPBuffer/EsriExtendedTypes/EsriExtendedTypes.proto";
 
 message EsriTypes {
-		enum GeometryType {
-			esriGeometryTypePoint = 0;
-			esriGeometryTypeMultipoint = 1;
-			esriGeometryTypePolyline = 2;
-			esriGeometryTypePolygon = 3;
-			esriGeometryTypeMultipatch = 4;
-			esriGeometryTypeEnvelope = 5;
-		}
+        enum GeometryType {
+            esriGeometryTypePoint = 0;
+            esriGeometryTypeMultipoint = 1;
+            esriGeometryTypePolyline = 2;
+            esriGeometryTypePolygon = 3;
+            esriGeometryTypeMultipatch = 4;
+            esriGeometryTypeEnvelope = 5;
+        }
 
-		enum esriSpatialRel {
-			esriSpatialRelIntersects = 0;
-			esriSpatialRelContains = 1;
-			esriSpatialRelCrosses = 2;
-			esriSpatialRelEnvelopeIntersects = 3;
-			esriSpatialRelIndexIntersects = 4;
-			esriSpatialRelOverlaps = 5;
-			esriSpatialRelTouches = 6;
-			esriSpatialRelWithin = 7;
-		}
+        enum esriSpatialRel {
+            esriSpatialRelIntersects = 0;
+            esriSpatialRelContains = 1;
+            esriSpatialRelCrosses = 2;
+            esriSpatialRelEnvelopeIntersects = 3;
+            esriSpatialRelIndexIntersects = 4;
+            esriSpatialRelOverlaps = 5;
+            esriSpatialRelTouches = 6;
+            esriSpatialRelWithin = 7;
+        }
 
-		enum esriFeatureEncoding {
-			esriFeatureEncoding_UNSPECIFIED = 0;
-			esriDefault = 1;
-			esriCompressedShapeBuffer = 2;
-		}
+        enum esriFeatureEncoding {
+            esriFeatureEncoding_UNSPECIFIED = 0;
+            esriDefault = 1;
+            esriCompressedShapeBuffer = 2;
+        }
 
-		enum MergePolicyType {
-			esriMergePolicyType_UNSPECIFIED = 0; // This means the value was not set in the PBF message.
-			esriMergePolicyTypeSumValues = 1;
-			esriMergePolicyTypeAreaWeighted = 2;
-			esriMergePolicyTypeDefaultValue = 3;
-		}
+        enum MergePolicyType {
+            esriMergePolicyType_UNSPECIFIED = 0; // This means the value was not set in the PBF message.
+            esriMergePolicyTypeSumValues = 1;
+            esriMergePolicyTypeAreaWeighted = 2;
+            esriMergePolicyTypeDefaultValue = 3;
+        }
 
-		enum SplitPolicyType {
-			esriSplitPolicyType_UNSPECIFIED = 0; // This means the value was not set in the PBF message.
-			esriSplitPolicyTypeGeometryRatio = 1;
-			esriSplitPolicyTypeDuplicate = 2;
-			esriSplitPolicyTypeDefaultValue = 3;
-		}
+        enum SplitPolicyType {
+            esriSplitPolicyType_UNSPECIFIED = 0; // This means the value was not set in the PBF message.
+            esriSplitPolicyTypeGeometryRatio = 1;
+            esriSplitPolicyTypeDuplicate = 2;
+            esriSplitPolicyTypeDefaultValue = 3;
+        }
 
-		enum QuantizeOriginPostion {
-			upperLeft = 0;
-			lowerLeft = 1;
-		}
+        enum QuantizeOriginPostion {
+            upperLeft = 0;
+            lowerLeft = 1;
+        }
 
-		enum QuantizeMode {
-			view = 0;
-			edit = 1;
-		}
+        enum QuantizeMode {
+            view = 0;
+            edit = 1;
+        }
 
-		message Scale {
-			double xScale = 1;
-			double yScale = 2;
-			double mScale = 3;
-			double zScale = 4;
-		}
+        message Scale {
+            double xScale = 1;
+            double yScale = 2;
+            double mScale = 3;
+            double zScale = 4;
+        }
 
-		message Translate {
-			double xTranslate = 1;
-			double yTranslate = 2;
-			double mTranslate = 3;
-			double zTranslate = 4;
-		}
+        message Translate {
+            double xTranslate = 1;
+            double yTranslate = 2;
+            double mTranslate = 3;
+            double zTranslate = 4;
+        }
 
-		message Transform {
-			QuantizeOriginPostion quantizeOriginPostion= 1;
-			Scale scale = 2;
-			Translate translate = 3;
-		}
+        message Transform {
+            QuantizeOriginPostion quantizeOriginPostion= 1;
+            Scale scale = 2;
+            Translate translate = 3;
+        }
 
-		message QuantizationParameters {
-			Envelope extent = 1;
-			QuantizeMode mode = 2;
-			QuantizeOriginPostion quantizeOriginPostion = 3;
-			double tolerance = 4;
-		}
+        message QuantizationParameters {
+            Envelope extent = 1;
+            QuantizeMode mode = 2;
+            QuantizeOriginPostion quantizeOriginPostion = 3;
+            double tolerance = 4;
+        }
 
-		message SpatialReference {
-			uint32 wkid = 1;
-			uint32 lastestWkid = 2;
-			uint32 vcsWkid = 3;
-			uint32 latestVcsWkid = 4;
-			string wkt = 5;
-			uint32 sdesrid = 6;
-			string wkt2 = 7;
-		}
+        message SpatialReference {
+            uint32 wkid = 1;
+            uint32 lastestWkid = 2;
+            uint32 vcsWkid = 3;
+            uint32 latestVcsWkid = 4;
+            string wkt = 5;
+            uint32 sdesrid = 6;
+            string wkt2 = 7;
+        }
 
-		message FieldIndex {
-			string name = 1;
-			string fields = 2;
-			bool isAscending = 3;
-			bool isUnique = 4;
-			string description = 5;
-		}
+        message FieldIndex {
+            string name = 1;
+            string fields = 2;
+            bool isAscending = 3;
+            bool isUnique = 4;
+            string description = 5;
+        }
 
-		message Value {
-			oneof value_type {
-				// Exactly one of these values must be present in a valid message
-				string string_value = 1;
-				float  float_value = 2;
-				double double_value = 3;
-				sint32 sint_value = 4;
-				uint32 uint_value = 5;
-				int64  int64_value = 6;
-				uint64 uint64_value = 7;
-				sint64 sint64_value = 8;
-				bool bool_value = 9;
-				bool null_value = 10;
-			}
-			// This index represents the position of the field that this value is associated with in a list of field names.
-			// It is currently used for mapping to the field name list present in LayerEdits.LayerEdit message
-			optional uint32 index = 11;
-		}
+        message Value {
+            oneof value_type {
+                // Exactly one of these values must be present in a valid message
+                string string_value = 1;
+                float  float_value = 2;
+                double double_value = 3;
+                sint32 sint_value = 4;
+                uint32 uint_value = 5;
+                int64  int64_value = 6;
+                uint64 uint64_value = 7;
+                sint64 sint64_value = 8;
+                bool bool_value = 9;
+                bool null_value = 10;
+            }
+            // This index represents the position of the field that this value is associated with in a list of field names.
+            // It is currently used for mapping to the field name list present in LayerEdits.LayerEdit message
+            optional uint32 index = 11;
+        }
 
-		message Envelope {
-			double XMin = 1;
-			double YMin = 2;
-			double XMax = 3;
-			double YMax = 4;
-			SpatialReference SpatialReference = 5;
-			optional double ZMin = 6;
-			optional double MMin = 7;
-			optional double ZMax = 8;
-			optional double MMax = 9;
-		}
+        message Envelope {
+            double XMin = 1;
+            double YMin = 2;
+            double XMax = 3;
+            double YMax = 4;
+            SpatialReference SpatialReference = 5;
+            optional double ZMin = 6;
+            optional double MMin = 7;
+            optional double ZMax = 8;
+            optional double MMax = 9;
+        }
 
-		message CodedValue {
-			string name = 1;
-			Value code = 2;
-		}
+        message CodedValue {
+            string name = 1;
+            Value code = 2;
+        }
 
-		message CodedValueDomain {
-			repeated CodedValue codesValues = 3;
-		}
+        message CodedValueDomain {
+            repeated CodedValue codesValues = 3;
+        }
 
-		message RangeDomain {
-			repeated EsriTypes.Value range = 3;
-		}
+        message RangeDomain {
+            repeated EsriTypes.Value range = 3;
+        }
 
-		message Domain {
-			string type = 1;
-			string name = 2;
-			oneof of {
-				CodedValueDomain codedValueDomain = 3;
-				RangeDomain rangeDomain = 4;
-			}
-			EsriExtendedTypes.FieldType fieldType = 5;
-			MergePolicyType mergePolicyType = 6;
-			SplitPolicyType splitPolicyType = 7;
-		}
+        message Domain {
+            string type = 1;
+            string name = 2;
+            oneof of {
+                CodedValueDomain codedValueDomain = 3;
+                RangeDomain rangeDomain = 4;
+            }
+            EsriExtendedTypes.FieldType fieldType = 5;
+            MergePolicyType mergePolicyType = 6;
+            SplitPolicyType splitPolicyType = 7;
+        }
 
-		message DatumTransformation {
-			uint32 wkid = 1;
-			string wkt = 2;
-			string transformDirection = 3;
-			string transformJson = 4;
-			SpatialReference fromSR = 5;
-			SpatialReference toSR = 6;
-			string wkt2 = 7;
-		}
+        message DatumTransformation {
+            uint32 wkid = 1;
+            string wkt = 2;
+            string transformDirection = 3;
+            string transformJson = 4;
+            SpatialReference fromSR = 5;
+            SpatialReference toSR = 6;
+            string wkt2 = 7;
+        }
 }

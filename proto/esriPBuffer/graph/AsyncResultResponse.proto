@@ -1,4 +1,4 @@
-﻿/* Copyright 2024 Esri
+﻿/* Copyright 2025 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/SyncDataModelResponse.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/graph/ExportServiceDefinitionResult.proto";
 
 // ../KnowledgeGraphServer/jobs/results/<job-id>
 
@@ -33,5 +34,6 @@ message AsyncResultResponse {
 
 	oneof operation_response {
 		SyncDataModelResponse sync_data_model_response = 4;
+		ExportServiceDefinitionResult export_service_definition_result = 7;
 	}
 }

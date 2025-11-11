@@ -21,15 +21,11 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
-message SearchIndexProperties {
-  repeated string property_names = 1;
-}
+// ../KnowledgeGraphServer/dataTransfer/export
 
-message SearchIndex {
-  reserved 3;
-  reserved "analyzers";
+message ExportResponse {
+  // This error is used to indicate high-level errors that result in the complete failure of the REST operation.
+  Error error = 1;
 
-  string name = 1;                                            // The search index name
-  esriNamedTypeCategory supported_category = 2;               // Indicates the level of support from the search index
-  map<string, SearchIndexProperties> search_properties = 4;   // The map of `<typeName, propertyNames>` making up the graph properties participating in the search index
+  string async_status_url = 2;
 }

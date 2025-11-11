@@ -1,4 +1,4 @@
-﻿/* Copyright 2024 Esri
+﻿/* Copyright 2025 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,16 @@ import "esriPBuffer/graph/EsriGraphTypes.proto";
 // ../KnowledgeGraphServer/graph/query
 
 message GraphQueryResultHeader {
-	uint64 data_model_timestamp = 1;   // UTC UNIX epoch in milliseconds
-	Transform transform = 2;
-	Error error = 3;                   // optional
-	repeated string field_names = 4;
-	bool compressed_frames = 5;
-	EsriTypes.SpatialReference sr = 6; // spatial reference of the returned geometries
+  uint64 data_model_timestamp = 1;   // UTC UNIX epoch in milliseconds.
+
+  Error error = 3;                   // Error that occurred during query parsing or execution.
+  repeated Error warnings = 7;       // Warnings that occurred during query parsing or execution.
+
+  Transform transform = 2;           // Transformation parameters for client to decode geometries.
+  EsriTypes.SpatialReference sr = 6; // Spatial reference of the returned geometries.
+
+  repeated string field_names = 4;   // Well-ordered field names in the result set.
+  bool compressed_frames = 5;        // Indicates whether the GraphQueryResultFrames are compressed.
 }
 
 message GraphQueryRow {
@@ -38,7 +42,7 @@ message GraphQueryRow {
 }
 
 message GraphQueryResultFrame {
-	Error error = 1; // optional
+	Error error = 1;
 	repeated GraphQueryRow rows = 2;
 
 	// `exceeded_transfer_limit` property can only be set on the last frame of the graph query response.

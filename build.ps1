@@ -15,7 +15,7 @@
  #>
  
 $compiler_path = "bin\protoc.exe"
-$runtime_ver = "25.5"
+$runtime_ver = "29.5"
 $proto_folder = Get-Item ".\proto"
 
 # C++
