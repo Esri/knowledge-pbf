@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 syntax = "proto3";
 package esriPBuffer.graph;
 option java_package = "com.esri.arcgis.protobuf.graph";
@@ -21,16 +21,9 @@ option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
-// ../KnowledgeGraphServer/dataModel/edit/namedTypes/add
 
-message GraphNamedObjectTypeAddResult {
-	string name = 1;
-	Error error = 2;
-}
+// ../KnowledgeGraphServer/jobs/<job-id>/cancel
 
-message GraphNamedObjectTypeAddsResponse {
-	Error error = 1; // High level error in case there is a non-entity or relationship specific reason for the failure.
-
-	repeated GraphNamedObjectTypeAddResult entity_add_results = 2;
-	repeated GraphNamedObjectTypeAddResult relationship_add_results = 3;
+message AsyncCancellationResponse {
+    Error error = 1;
 }

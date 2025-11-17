@@ -1,0 +1,49 @@
+﻿/* Copyright 2025 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/graph/DataTransferTypes.proto";
+
+// Results of  ../KnowledgeGraphServer/dataTransfer/export operation when the export package is .sd file
+
+message ExportServiceDefinitionResult {
+  // High-level error that indicates the overall success or failure of the export operation.
+  Error error = 1;
+
+  // Warnings that occurred during the export operation.
+  repeated Error warnings = 2;
+
+  // The name of the service definition portal item.
+  string service_definition_name = 3;
+
+  // The export format.
+  ExportDataFormat data_format = 4;
+
+  // URL to download the service definition.
+  string service_definition_download_url = 5;
+
+  // Aggregated statistics for the export operation, grouped by entity and relationship types.
+  //
+  // The map key represents the name of the entity or relationship type,
+  // and the value provides the transfer statistics for that type,
+  // including counts of items in the source versus those successfully exported.
+  map<string, DataTransferStats> statistics = 6;
+}

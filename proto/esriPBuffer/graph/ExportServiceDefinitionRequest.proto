@@ -1,0 +1,53 @@
+﻿/* Copyright 2025 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/DataTransferTypes.proto";
+
+// Request parameters for exporting a Knowledge Graph service as a
+// Service Definition (SD) portal item. This message is specific to
+// the "export as service definition" format.
+//
+// The exported Service Definition bundles together:
+//   - Portal item info
+//   - Service manifest xml
+//   - Service configuration json file
+//   - Knowledge Graph service data model
+//   - Graph data
+//
+// This packaging enables publishing a new knowledge graph service using the existing publish operation in sharing API.
+message ExportServiceDefinitionRequest {
+  // The name of the exported Service Definition (.sd) file.
+  //
+  // If not specified, a unique name will be automatically generated
+  // and returned in the ExportServiceDefinitionResult using the
+  // format: `<ServiceName>_SD_<JobId>`, where:
+  //   - <ServiceName> is the Knowledge Graph service name.
+  //   - <JobId> is the identifier of the asynchronous export job.
+  //
+  // The inclusion of the JobId ensures uniqueness and traceability
+  // for each export request.
+  optional string service_definition_name = 1;
+
+  // The data format used within the Service Definition package
+  // (e.g., GeoParquet). Determines how the graph data and schema
+  // are serialized.
+  ExportDataFormat data_format = 2;
+}

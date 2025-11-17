@@ -1,0 +1,45 @@
+﻿/* Copyright 2025 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+// The format in which the data will be exported.
+enum ExportDataFormat {
+  UNSUPPORTED_EXPORT_DATA_FORMAT = 0;
+
+  // GeoParquet export format.
+  // If not specified by the user, this format will be used as the default.
+  EXPORT_DATA_FORMAT_GEOPARQUET = 1;
+}
+
+// Statistics capturing the number of items involved in a data transfer.
+// The semantics of the counts differ depending on whether the operation
+// is an export or an import:
+//
+// For export operations:
+//   - source_count: Total number of entities or relationships present in the Knowledge Graph service.
+//   - transferred_count: Number of entities or relationships successfully exported to the output format.
+//
+// For import operations:
+//   - source_count: Total number of entities or relationships available in the source data (e.g., a .sd file).
+//   - transferred_count: Number of entities or relationships successfully imported into the Knowledge Graph service.
+message DataTransferStats {
+  uint64 source_count = 1;
+  uint64 transferred_count = 2;
+}

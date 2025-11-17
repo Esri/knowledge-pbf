@@ -1,4 +1,4 @@
-﻿/* Copyright 2023 Esri
+﻿/* Copyright 2025 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,9 @@ message NamedObjectUpdate {
 		AnyValue update_id = 4;
 	}
 
+	// Properties map only contains properties that will be updated. Using a null value for a property
+	// is equivalent to removing the property from the named object.
+	//
 	// Properties map does not need to include identifiers (i.e unique identifier, objectid, globalid).
 	repeated KeyValuePair properties = 5;
 }
