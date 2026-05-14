@@ -1,4 +1,4 @@
-﻿/* Copyright 2025 Esri
+﻿/* Copyright 2026 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import "esriPBuffer/graph/ExportServiceDefinitionRequest.proto";
 //
 // Current behavior:
 //   - Supports ExportServiceDefinitionRequest, which packages the portal item
-//     info, Knowledge Graph service data model, and graph data into Esri�s
+//     info, Knowledge Graph service data model, and graph data into Esri's
 //     standard Service Definition (.sd) file format.
 message ExportRequest {
   oneof export_request_type {

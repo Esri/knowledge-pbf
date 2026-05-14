@@ -1,0 +1,73 @@
+﻿/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+// ../admin/../KnowledgeGraphServer/replicas/trimChangeLog
+
+message TrimChangeLogRequest {
+
+  oneof trim_mode {
+    TrimBeforeDate trim_before = 1;
+    TrimPreserveReplicas trim_preserve_replicas = 2;
+    TrimChangeLogStatistics change_log_statistics = 3;
+  }
+
+  // Process the request asynchronously.
+  // The response will contain a url that can be used to query the status of the request.
+  bool async = 4;
+}
+
+message ForceTrim {
+  // Unregisters replicas whose `last_sync_date` is prior to the specified `trim_before_date`
+  // CAUTION:
+  // This will fail `/synchronize` operations against stale replicas, as their resource no longer exists,
+  // and force stale replica owners to recreate their replicas.
+  bool unregister_stale_replicas = 3;
+}
+
+message TrimBeforeDate {
+  // The date to trim the change log to. All change log entries made prior to this date (exclusive) will be removed.
+  // UTC UNIX timestamp in milliseconds since epoch.
+  int64 trim_before_date = 1;
+
+  // Force the trim operation even if it may result in replicas unable to perform a delta download due to rows
+  // removed from the change log that are required for delta synchronization.
+  // Replicas can still perform full downloads after a forced trim using the `replica_snapshot` download option.
+  optional ForceTrim force_trim = 2;
+}
+
+message TrimPreserveReplicas {
+  // Empty message to represent a `trim_mode` that interrogates all replica definitions
+  // and chooses the minimum `last_sync_date` amongst all replicas as the `trim_before_date` effectively
+  // preserving every replicas ability to `/synchronize` using the `replica_delta` option. 
+  // That is, the `/trimChangeLog` operation does not delete rows out from under replicas defined
+  // in the service.
+}
+
+message TrimChangeLogStatistics {
+  // A `trim_mode` that does not perform any trim operation, but rather
+  // gathers log statistics to aid owners and admins in determining any appropriate actions prior to trimming
+  // the change log.
+
+  // UTC UNIX timestamp in milliseconds since epoch.
+  // Providing a `candidate_trim_before_date` will return statistics as if that date were used to trim the change log.
+  // If no `candidate_trim_before_date` is provided, statistics will be returned for the current date/time.
+  optional int64 candidate_trim_before_date = 1;
+}

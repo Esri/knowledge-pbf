@@ -1,0 +1,202 @@
+﻿/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/EsriTypes.proto";
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Enums
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+enum SyncDataFormat {
+  // The format of the features returned in `/createReplica` and `/sync`responses
+  SYNC_DATA_FORMAT_UNSPECIFIED = 0;
+  PBF = 1;          // default KGS spec Protobuf
+}
+
+enum SyncDirection {
+  // The direction of the sync operation
+  SYNC_DIRECTION_UNSPECIFIED = 0;
+  BIDIRECTIONAL = 1; // Download and upload changes (Default)
+  UPLOAD = 2;        // Upload changes to the server
+  DOWNLOAD = 3;      // Download changes from the server
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// ReplicaFilters
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+message ReplicaFilters {
+  oneof definition {
+    StaticDefinition static_definition = 1;
+  }
+
+  // Applies to input geometries sent by the client to the server or server to client.
+  // These may be geometries referenced as bind parameters in the `open_cypher_where_clause`,
+  // or geometry literals in the `open_cypher_where_clause`.
+  //
+  // When `in_sr` is not set, geometries are assumed to be in the spatial reference of the data model.
+  Transform input_transform = 2;
+  EsriTypes.SpatialReference in_sr = 3;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Definition Options
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+message IncludeProvenance {
+  // `include_source_documents` determines whether the source documents of the provenance are included in the result set.
+  //
+  // When `include_source_documents` is set to true, documents set as a source of the provenance are
+  // included in the result.
+  //
+  // When `include_source_documents` is set to false, documents set as a source of the provenance are
+  // excluded from the result.
+  bool include_source_documents = 1;
+}
+
+message ProvenanceOptions {
+  // ProvenanceOptions define the result set for associated provenance for the specified entity or relationship type.
+  //
+  // When `include_provenance` is not set, no associated provenance is returned.
+  // Clients can opt-in by setting the `include_provenance` parameter.
+  //
+  // Further refinement of the provenance result set can be achieved by setting the behavioral flags of the
+  // `IncludeProvenance` message.
+  optional IncludeProvenance include_provenance = 1;
+}
+
+message IncludeConnectedDocuments {
+  // `provenance_options` determines whether the provenance of the connected documents are included in the result set.
+  ProvenanceOptions provenance_options = 1;
+}
+
+message DocumentOptions {
+  // DocumentOptions define the result set for associated documents for the specified entity or relationship type.
+  //
+  // When `include_connected_documents` is not set, no incident `HasDocument` relationships nor adjacent `Document`
+  // entities are returned in the result set.
+  // Clients can opt-in by setting the `include_connected_documents` parameter.
+  //
+  // Further refinement of the related document result set can be achieved by setting the behavioral flags of the
+  // `IncludeConnectedDocuments` message.
+  optional IncludeConnectedDocuments include_connected_documents = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// StaticDefinition
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+message StaticDefinition {
+  // The StaticDefinition guarantees entities and relationships defined explicitly by the replica definition are returned
+  // in `/createReplica` and `/synchronizeReplica` responses. Graph topology modifications do not impact the types
+  // returned by this replica definition. That is, the type schema is static, however property schema may be dynamic.
+  // Client applications should be written to be property schema tolerant of property schema modifications from the server.
+
+  repeated EntityTypeReplicaDefinition entity_types = 1;
+  repeated RelationshipTypeReplicaDefinition relationship_types = 2;
+}
+
+message NamedTypeReplicaDefinition {
+  // The name of the entity or relationship type to include in the replica.
+  string type_name = 1;
+
+  // Defines an attribute query for the entity or relationship type. The query is an openCypher WHERE clause.
+  // Entities satisfying the query
+  //   MATCH (n:<type_name>) WHERE <where_clause> RETURN n
+  // are included in the replica. Entities can be referenced by the symbolic name `n`.
+  //
+  // Relationships satisfying the query
+  //   MATCH ()-[n:<type_name>]->() WHERE <where_clause> RETURN n
+  // are included in the replica. Additionally the origin and destination entities of the relationship must be defined
+  // in the replica. Relationships can be referenced by the symbolic name `n`.
+  //
+  //  - When no `open_cypher_where_clause` is provided, all entities or relationships of the type are included in the replica.
+  //  - Spatial operators are supported in the `open_cypher_where_clause`.
+  //  - The `open_cypher_where_clause` can reference parameters defined in the `parameters` map.
+  string open_cypher_where_clause = 2;
+
+  // `parameters` can only contain combinations of:
+  //    - primitive values
+  //    - array values
+  //    - homogeneous arrays
+  //    - anonymous objects
+  // We'll throw a runtime error if the following are encountered:
+  //    - entity values
+  //    - relationship values
+  // Parameter names must be referenced in the `open_cypher_where_clause`.
+  map<string, AnyValue> parameters = 3;
+
+  // Defines the result set for associated provenance of entities or relationships
+  // defined by the `type_name` & `where_clause`.
+  ProvenanceOptions provenance_options = 4;
+}
+
+message EntityTypeReplicaDefinition {
+  NamedTypeReplicaDefinition entity_type_replica_definition = 1;
+
+  // Defines the result set for incident `HasDocument` relationships and adjacent `Document` entities.
+  DocumentOptions document_options = 2;
+}
+
+message RelationshipTypeReplicaDefinition {
+  // Relationships are returned when origin and destination entity types are defined in the replica.
+  // For example, suppose the relationship type, `OWNS` has origin entity types, `Person` and
+  // destination entity types `Vehicle` and `Parcel`.
+  //    (o:Person)-[r:OWNS]->(d:Vehicle|Parcel)
+  //
+  // `OWNS` relationships are returned in the replica response if and only if
+  //   1. A valid origin entity type and destination entity type are included in the replica definition.
+  //      In our example that would include `Person` and at least one of { `Vehicle`, `Parcel` }.
+  //   2. The `where_clause` defining the origin and destination entity types includes entities that satisfy
+  //      the graph pattern `(o)-[r:OWNS]->(d)`. In our example, the where clause on origin type, `Person` does not
+  //      exclude entities of `Person` connected to either `Vehicle` or `Parcel` through the `OWNS` relationship type.
+  //
+  // In other words, all relationships in the replica have end points in the replica.
+  //
+  // The `HasDocument` relationship type is not allowed to be defined as a `relationship_type_replica_definition`.
+  // It is managed on entity types through the flag, `return_connected_documents` which returns incident `HasDocument`
+  // relationships.
+  NamedTypeReplicaDefinition relationship_type_replica_definition = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Replica Data Header
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+message ReplicaHeader {
+  int64 sync_date = 1;                     // UTC UNIX timestamp in milliseconds since epoch.
+  Transform transform = 2;                 // The transform to apply to the returned geometries
+  EsriTypes.SpatialReference sr = 3;       // The spatial reference of the returned geometries
+}
+
+enum ReplicaDataDeltaType {
+  REPLICA_DATA_DELTA_TYPE_UNSPECIFIED = 0;
+  ADD = 1;
+  UPDATE = 2;
+  DELETE = 3;
+}
+
+message ReplicaDataHeader {
+  ReplicaDataDeltaType delta_type = 1;
+  string type_name = 2;
+  esriNamedTypeCategory type_category = 3;
+}

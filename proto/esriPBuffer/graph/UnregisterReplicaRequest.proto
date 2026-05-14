@@ -15,14 +15,18 @@
 
 syntax = "proto3";
 package esriPBuffer.graph;
-option java_package = "com.esri.arcgis.protobuf";
+option java_package = "com.esri.arcgis.protobuf.graph";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
-import "esriPBuffer/graph/EsriGraphTypes.proto";
+// ../KnowledgeGraphServer/replicas/unregister
 
-message GraphObjectIdentifierSet {
-	oneof id_array_type {
-		ArrayValue id_array = 1;
-	}
+message UnregisterAllAccessibleReplicas {
+}
+
+message UnregisterReplicaRequest {
+  oneof replicas {
+    bytes replica_ids = 1; // Concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+    UnregisterAllAccessibleReplicas unregister_all = 2;
+  }
 }

@@ -1,4 +1,4 @@
-﻿/* Copyright 2025 Esri
+﻿/* Copyright 2026 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ import "esriPBuffer/graph/EsriGraphTypes.proto";
 // ../rest/admin/../KnowledgeGraphServer/dataModel/constraintRules/update
 
 message GraphConstraintRuleUpdateResult {
-  string name = 1;
-  Error error = 2;
-  repeated Error warnings = 3;
+	string name = 1;
+	Error error = 2;
+	repeated Error warnings = 3;
 }
 
 message GraphConstraintRuleUpdatesResponse {
-  Error error = 1; // High level error used in case there is a non-constraint-rule-specific reason for the failure.
+	Error error = 1; // High level error used in case there is a non-constraint-rule-specific reason for the failure.
 
-  repeated GraphConstraintRuleUpdateResult constraint_rule_update_results = 2;
+	repeated GraphConstraintRuleUpdateResult constraint_rule_update_results = 2;
 }

@@ -13,16 +13,29 @@
  * limitations under the License.
  */
 
+
 syntax = "proto3";
 package esriPBuffer.graph;
-option java_package = "com.esri.arcgis.protobuf";
+option java_package = "com.esri.arcgis.protobuf.graph";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
+import "esriPBuffer/graph/SyncTypes.proto";
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
-message GraphObjectIdentifierSet {
-	oneof id_array_type {
-		ArrayValue id_array = 1;
-	}
+// ../KnowledgeGraphServer/replicas/<replica_id>
+
+message ReplicaDefinitionResponse {
+  Error error = 1;
+  ReplicaDefinition replica_definition = 2;
+}
+
+message ReplicaDefinition {
+  string replica_name = 1;
+  bytes replica_id = 2;       // 16-byte RFC4122 UUID
+  string replica_owner = 3;
+  int64 last_sync_date = 4;   // UTC UNIX timestamp in milliseconds since epoch
+  int64 creation_date = 5;    // UTC UNIX timestamp in milliseconds since epoch
+  SyncDirection sync_direction = 6;
+  ReplicaFilters replica_filters = 7;
 }

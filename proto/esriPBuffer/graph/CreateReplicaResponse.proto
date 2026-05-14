@@ -1,0 +1,50 @@
+﻿/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/graph/SyncTypes.proto";
+
+// ../KnowledgeGraphServer/replicas/create
+
+message CreateReplicaResponse {
+  Error error = 1;  // To be used in case there was a non-replica-specific reason for the failure.
+
+  oneof result {
+    string async_status_url = 2;
+    CreateReplicaResult create_replica_result = 3;
+  }
+}
+
+message CreateReplicaResult {
+  repeated Error errors = 1;
+  repeated Error warnings = 2;
+
+  string replica_name = 3;                // The name of the replica. May differ from the `requested_replica_name`
+  string requested_replica_name = 4;      // The requested name of the replica in `CreateReplicaRequest`
+  bytes replica_id = 5;                   // 16-byte RFC4122 UUID
+  int64 sync_date = 6;                    // UTC UNIX timestamp in milliseconds since epoch.
+
+  SyncDataFormat replica_data_format = 7; // The data format of the replica file.
+  oneof replica_data {
+    string replica_data_url = 8;          // URL to download replica data.
+  }
+}
