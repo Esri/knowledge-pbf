@@ -1,4 +1,4 @@
-﻿/* Copyright 2025 Esri
+﻿/* Copyright 2026 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,8 +93,7 @@ message DurationArray {
 	repeated DurationValue value = 1;
 }
 
-// A note on the temporal types. The restrictions mentioned below are in place and enforced
-// for input in ApplyEdits. 
+// A note on the temporal types. The restrictions mentioned below are in place and enforced for input in ApplyEdits.
 // The Query pipeline output is not restricted, and valid `openCypher` queries may produce values
 // outside the restricted range. For example `RETURN date("0000-01-01") + duration("-P1D")`.
 

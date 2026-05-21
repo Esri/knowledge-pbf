@@ -1,0 +1,91 @@
+﻿/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/ApplyEditsRequest.proto";
+import "esriPBuffer/graph/SyncTypes.proto";
+
+// ../KnowledgeGraphServer/replicas/{replicaId}/synchronize
+
+message SynchronizeReplicaRequest {
+
+  DownloadParameters download_parameters = 1;
+  UploadEdits upload_edits = 2;
+
+  bool async = 3;
+}
+
+message ReplicaSnapshot {
+  // empty message to indicate the response is a snapshot of the replica as defined by the replica definition.
+  //
+  // When replica_snapshot is specified, the server will return the current representation of entities and
+  // relationships of the replica as defined by the replica definition instead of the delta of the changes.
+}
+
+message ReplicaDeltas {
+  // The date the replica was last synced. A new sync_date is sent in the response
+  // of `replicas/create` and `replicas/{replicaId}/synchronize`. Clients should persist this value
+  // and use it with the next `replicas/{replicaId}/synchronize`.
+  //
+  // The UTC UNIX timestamp from which to send back changes.
+  // This date is used by the server as the lower bounds (exclusive) to gather edits since the `last_sync_date`.
+  // (last_sync_date, sync_date] is the range determining the edits sent in the response.
+  int64 last_sync_date = 1;
+}
+
+message DownloadParameters {
+  oneof replica_download_options {
+    ReplicaDeltas replica_deltas = 1;
+    ReplicaSnapshot replica_snapshot = 2;
+  }
+
+  // The data format of the download data.
+  SyncDataFormat data_format = 3;
+}
+
+message UploadEdits {
+  // The edits to apply to the service.
+  // objectids are determined by the server. Client-provided globalids are preserved.
+  // Client-provided editor tracking values are preserved.
+  // The service must have Editing, Create, Update and/or Delete capabilities to accept edits.
+  oneof edit_format {
+    SyncApplyEdits sync_apply_edits = 1;
+    UploadFile upload_file = 2;
+  }
+}
+
+message SyncApplyEdits {
+  GraphApplyEditsHeader edits_header = 1;
+
+  oneof edits {
+    SyncEditFrames frames = 2;
+    bytes compressed_frames = 3;
+  }
+}
+
+message SyncEditFrames {
+  repeated GraphApplyEditsFrame frames = 1;
+}
+
+message UploadFile {
+  // 16-byte RFC4122 UUID referencing the upload item id
+  bytes edits_upload_id = 1;
+  SyncDataFormat upload_format = 2;
+}

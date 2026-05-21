@@ -15,14 +15,21 @@
 
 syntax = "proto3";
 package esriPBuffer.graph;
-option java_package = "com.esri.arcgis.protobuf";
+option java_package = "com.esri.arcgis.protobuf.graph";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
-message GraphObjectIdentifierSet {
-	oneof id_array_type {
-		ArrayValue id_array = 1;
-	}
+// ../KnowledgeGraphServer/replicas/unregister
+
+message UnregisterReplicaResponse {
+  Error error = 1; // High-Level error indicates failure of entire REST operation.
+
+  repeated UnregisterReplicaResult unregister_results = 2;
+}
+
+message UnregisterReplicaResult {
+  bytes replica_id = 1; // 16-byte RFC4122 UUID
+  Error error = 2;
 }

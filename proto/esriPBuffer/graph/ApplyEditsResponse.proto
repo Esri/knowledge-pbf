@@ -1,4 +1,4 @@
-﻿/* Copyright 2025 Esri
+﻿/* Copyright 2026 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,76 +28,89 @@ import "esriPBuffer/graph/DataModelTypes.proto";
 //
 
 message EditResults {
-  reserved 1, 2;
-  reserved "oid_array", "globalid_array";
+	reserved 1, 2;
+	reserved "oid_array", "globalid_array";
 
-  // For every edit result K:
-  //   - `errors`[K] will hold the `Error`, if any
-  //
-  // If errors[K] is set, then:
-  //   - `id_array`[K] == null_tag or null equivalent of `AnyValue`
+	// For every edit result K:
+	//   - `errors`[K] will hold the `Error`, if any
+	//
+	// If errors[K] is set, then:
+	//   - `id_array`[K] == null_tag or null equivalent of `AnyValue`
 
-  // indexed by position in `id_array`
-  map<uint64, Error> errors = 3;
+	// indexed by position in `id_array`
+	map<uint64, Error> errors = 3;
 
-  // unique id value for every edit result K
-  ArrayValue id_array = 4;
+	// unique id value for every edit result K
+	ArrayValue id_array = 4;
 }
 
 message CascadingRelationshipDeletes {
-  reserved 2, 3;
-  reserved "origin_entity_globalid_array", "dest_entity_globalid_array";
+	reserved 2, 3;
+	reserved "origin_entity_globalid_array", "dest_entity_globalid_array";
 
-  // `EditResults` for all relationships automatically deleted because they were connected to a deleted entity.
-  EditResults relationship_delete_results = 1;
+	// `EditResults` for all relationships automatically deleted because they were connected to a deleted entity.
+	EditResults relationship_delete_results = 1;
 
-  // The array of origin entity unique identifiers.
-  ArrayValue origin_entity_id_array = 4;
+	// The array of origin entity unique identifiers.
+	ArrayValue origin_entity_id_array = 4;
 
-  // The array of destination entity unique identifiers.
-  ArrayValue dest_entity_id_array = 5;
+	// The array of destination entity unique identifiers.
+	ArrayValue dest_entity_id_array = 5;
 }
 
 message CascadingProvenanceDeletes {
-  // `EditResults` for all provenance records automatically deleted because they were sourced by a  deleted entity, relationship, or property value.
-  EditResults provenance_delete_results = 1;
+	// `EditResults` for all provenance records automatically deleted because they were sourced by a  deleted entity, relationship, or property value.
+	EditResults provenance_delete_results = 1;
 }
 
 message RelationshipTypeSchemaChanges {
-  reserved 1, 2;
-  reserved "origin_entity_types", "dest_entity_types";
+	reserved 1, 2;
+	reserved "origin_entity_types", "dest_entity_types";
 
-  repeated EndPoint new_end_points = 3;
-}
-
-message GraphApplyEditsResult {
-  Error error = 1; // High level error in case there was a non-entity/rel-specific reason for the failure.
-
-  // Grouped by named object type name.
-  map<string, EditResults> entity_add_results = 2;
-  map<string, EditResults> relationship_add_results = 3;
-
-  // Grouped by named object type name.
-  map<string, EditResults> entity_update_results = 4;
-  map<string, EditResults> relationship_update_results = 5;
-
-  // Grouped by named object type name.
-  map<string, EditResults> entity_delete_results = 6;
-  map<string, EditResults> relationship_delete_results = 7;
-
-  // Grouped by relationship type name.
-  map<string, CascadingRelationshipDeletes> cascading_relationship_delete_results = 8;
-  map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
-
-  // Deleted provenance records due to the deletion of their source entity, relationship, or property-value.
-  CascadingProvenanceDeletes cascading_provenance_delete_results = 10;
-
-  // portal username and the timestamp when the operation was performed
-  ApplyEditsMetadata apply_edits_metadata = 11;
+	repeated EndPoint new_end_points = 3;
 }
 
 message ApplyEditsMetadata {
-  string user_name = 1;
-  // UTC UNIX timestamp in milliseconds since epoch.
-  uint64 timestamp = 2;
+	string user_name = 1;
+	// UTC UNIX timestamp in milliseconds since epoch.
+	uint64 timestamp = 2;
+}
+
+message SchemaResults {
+	// Types that were referenced in the apply edits payload, but do not exist in the target knowledge graph service.
+	repeated string unknown_types = 1;
+
+	// Properties that were referenced in the apply edits payload, but do not exist in the target knowledge graph service.
+	// <TypeName, Array of PropertyNames>
+	map<string, StringArray> unknown_properties = 2;
+}
+
+message GraphApplyEditsResult {
+	Error error = 1; // High level error in case there was a non-entity/rel-specific reason for the failure.
+
+	// Grouped by named object type name.
+	map<string, EditResults> entity_add_results = 2;
+	map<string, EditResults> relationship_add_results = 3;
+
+	// Grouped by named object type name.
+	map<string, EditResults> entity_update_results = 4;
+	map<string, EditResults> relationship_update_results = 5;
+
+	// Grouped by named object type name.
+	map<string, EditResults> entity_delete_results = 6;
+	map<string, EditResults> relationship_delete_results = 7;
+
+	// Grouped by relationship type name.
+	map<string, CascadingRelationshipDeletes> cascading_relationship_delete_results = 8;
+	map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
+
+	// Deleted provenance records due to the deletion of their source entity, relationship, or property-value.
+	CascadingProvenanceDeletes cascading_provenance_delete_results = 10;
+
+	// portal username and the timestamp when the operation was performed
+	ApplyEditsMetadata apply_edits_metadata = 11;
+
+	// Ignored schema summary results.
+	// Only populated when this message is part of a synchronize replica response.
+	SchemaResults schema_results = 12;
 }

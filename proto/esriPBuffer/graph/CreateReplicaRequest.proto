@@ -1,0 +1,61 @@
+﻿/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/SyncTypes.proto";
+
+// ../KnowledgeGraphServer/replicas/create
+
+message CreateReplicaRequest {
+  // The name of the replica on the server. The replica name is unique per knowledge graph service.
+  // If not specified, a replica name will be assigned and returned in the CreateReplicaResponse.
+  // If specified, but the replica_name already exists on the server, a unique name will be returned in the response
+  // using the given replica_name as a base (that is, `MyReplica` may be returned as `MyReplica_0` if there is already a
+  // replica named MyReplica on the server).
+  optional string requested_replica_name = 1;
+
+  // The replica_id is a unique identifier for the replica. If not specified, a new replica_id will be generated.
+  // 16-byte RFC4122 UUID
+  optional bytes replica_id = 2;
+
+  oneof replica_definition {
+    // ReplicaFilters define the data to include in the replica.
+    ReplicaFilters replica_filters = 3;
+
+    // Creates a new replica based on an existing replica definition.
+    ReferenceReplica reference_replica = 4;
+  }
+
+  // SyncDirection defines the direction of synchronization allowed for the replica.
+  SyncDirection sync_direction = 5;
+
+  // The data format of the replica response.
+  SyncDataFormat data_format = 6;
+
+  // Process the request asynchronously.
+  // The response will contain a url that can be used to query the status of the request.
+  bool async = 7;
+}
+
+message ReferenceReplica {
+  // 16-byte RFC4122 UUID
+  bytes reference_replica_id = 1;
+}

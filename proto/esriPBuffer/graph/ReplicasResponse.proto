@@ -15,14 +15,21 @@
 
 syntax = "proto3";
 package esriPBuffer.graph;
-option java_package = "com.esri.arcgis.protobuf";
+option java_package = "com.esri.arcgis.protobuf.graph";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
 import "esriPBuffer/graph/EsriGraphTypes.proto";
 
-message GraphObjectIdentifierSet {
-	oneof id_array_type {
-		ArrayValue id_array = 1;
-	}
+// ../KnowledgeGraphServer/replicas
+
+message ReplicasResponse {
+  Error error = 1;
+  repeated ReplicaInfo replicas = 2;
+}
+
+message ReplicaInfo {
+  string replica_name = 1;
+  bytes replica_id = 2;       // 16-byte RFC4122 UUID
+  int64 last_sync_date = 3;   // UTC UNIX timestamp in milliseconds since epoch
 }

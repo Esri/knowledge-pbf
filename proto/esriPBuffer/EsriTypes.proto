@@ -1,4 +1,4 @@
-﻿/* Copyright 2023 Esri
+﻿/* Copyright 2026 Esri
  *
  * Licensed under the Apache License Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ message EsriTypes {
 			string description = 5;
 		}
 
-		message Value {
+		 message Value {
 			oneof value_type {
 				// Exactly one of these values must be present in a valid message
 				string string_value = 1;

@@ -1,0 +1,65 @@
+﻿/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/graph/ApplyEditsResponse.proto";
+import "esriPBuffer/graph/SyncTypes.proto";
+
+// ../KnowledgeGraphServer/replicas/{replicaId}/synchronize
+
+message SynchronizeReplicaResponse {
+  Error error = 1;  // To be used in case there was a non-synchronization specific reason for the failure.
+
+  oneof result {
+    string async_status_url = 2;
+    SynchronizeReplicaResult synchronize_replica_result = 3;
+  }
+}
+
+message SynchronizeReplicaResult {
+  repeated Error errors = 1;
+  repeated Error warnings = 2;
+
+  bytes replica_id = 3; // 16-byte RFC4122 UUID
+  // UTC UNIX timestamp in milliseconds since epoch.
+  // The moment of synchronization. Clients should persist this value and use it as the `edits_since_date with the next
+  // `replicas/{replicaId}/synchronize`.
+  int64 sync_date = 4;
+
+  DownloadResults download_results = 5;
+  UploadResults upload_results = 6;
+}
+
+message DownloadResults {
+  SyncDataFormat sync_data_format = 2; // The data format of the replica data file.
+  string sync_data_url = 3;            // URL to download the sync replica data file.
+}
+
+message UploadResults {
+  oneof upload_result {
+    SyncEditResults sync_edit_results = 1;
+    // Future upload result types can be added here, i.e. upload results as a file for large payloads.
+  }
+}
+
+message SyncEditResults {
+  GraphApplyEditsResult upload_edit_results = 1;
+}

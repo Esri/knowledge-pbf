@@ -1,0 +1,96 @@
+﻿/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option go_package = "esri.com/arcgis/protobuf/graph;graph";
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+
+// ../admin/../KnowledgeGraphServer/replicas/trimChangeLog
+
+message TrimChangeLogResponse {
+  Error error = 1;  // To be used in case there was a non-trim specific reason for the failure.
+
+  oneof result {
+    string async_status_url = 2;
+    TrimChangeLogResult trim_result = 3;
+  }
+}
+
+message TrimChangeLogResult {
+  Error error = 1;
+  repeated Error warnings = 2;
+
+  oneof trim_result {
+    TrimBeforeDateResult trim_before_result = 3;
+    TrimPreserveReplicasResult trim_preserve_result = 4;
+    TrimChangeLogStatisticsResult trim_log_stats = 5;
+  }
+}
+
+message TrimBeforeDateResult {
+  // `replica_id_array` is a concatenation of 1..N RFC4122 UUIDs. Size must be multiple of 16.
+  oneof replica_id_array {
+    // Contains an array of unregistered `replica_ids` whose `last_sync_date` was prior to the `trim_before_date`.
+    // Only populated when the `trim_mode` is `TrimBeforeDate`, `ForceTrim` option is specified and
+    // `unregister_stale_replicas` is true.
+    bytes unregistered_replica_id_array = 1;
+
+    // Contains an array of existing, stale `replica_ids` whose `last_sync_date` is prior to the `trim_before_date`.
+    // Populated when the `ForceTrim` option is specified and `unregister_stale_replicas` is false.
+    // Also populated when the `ForceTrim` option is not specified.
+    // In this case, if there are stale replicas, then the operation will fail, an `error` will be returned, and
+    // the stale replicas will be listed here.
+    bytes existing_stale_replica_id_array = 2;
+  }
+}
+
+message TrimPreserveReplicasResult {
+  // UTC UNIX timestamp in milliseconds since epoch.
+  // The effective `trim_before_date` used to trim the change log while preserving all replicas ability
+  // to delta synchronize.
+  int64 trim_before_date = 1;
+}
+
+message TrimChangeLogReplicaStats {
+  // 16-byte RFC4122 UUID
+  bytes replica_id = 1;
+
+  // UTC UNIX timestamp in milliseconds since epoch.
+  int64 last_sync_date = 2;
+
+  // The percentage of rows in the change log that would be deleted by trimming the change log using the
+  // `last_sync_date` of this replica as the `trim_before_date`.
+  double percent_rows_deleted_by_last_sync_date = 3;
+}
+
+message TrimChangeLogStatisticsResult {
+  // UTC UNIX timestamp in milliseconds since epoch.
+  // The `candidate_trim_before_date` provided in the `TrimChangeLogRequest`.
+  // If no `candidate_trim_before_date` was provided, this will be the current date/time used to evaluate the change log.
+  int64 candidate_trim_before_date = 1;
+
+  // The percentage of rows in the change log that would be deleted by trimming the change log using the
+  // `candidate_trim_before_date`.
+  double percent_rows_deleted_by_candidate_trim_before_date = 2;
+
+  // Replicas and their associated change log statistics impacted by trimming the change log with
+  // the specified `candidate_trim_before_date`.
+  repeated TrimChangeLogReplicaStats replica_log_stats = 3;
+}
