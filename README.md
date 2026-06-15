@@ -268,6 +268,72 @@ map<string, RelationshipTypeSchemaChanges> rel_type_schema_changes = 9;
 
 PBF messages required to read the response objects are defined in the [ApplyEditsResponse.proto](proto/esriPBuffer/graph/ApplyEditsResponse.proto) file. 
 
+# Replica Data Binary Protobuf Specification
+The following describes the byte specification of the binary protobuf (`.binpb`) file downloaded by `replica_data_url` and `sync_data_url` from `/replicas/create` & `/replicas/{replicaId}/synchronize` operations respectively.
+
+Namely, when the data format specified is `PBF`, the downloaded file is a `.zip` (7zip compressed) file containing multiple 
+`.binpb` files. There will be a minimum of 2 files describing the `ReplicaHeader` and the `DataModel`, the remaining
+files contain replica data in binary protobuf format.
+
+## Overview
+The `.zip` file has 3 components:
+1. A replica Header containing metadata about the replica data (`replica_header.binpb`)
+2. The data model of the service (`data_model.binpb`)
+3. The graph data as defined by the requested operation (`/replicas/create` or `/replicas/../synchronize`)
+
+## Replica Header
+- The `replica_header.binpb` file contains the metadata about the replica data.
+- 64-bit unsigned variable length integer indicating the size of the replica header
+- Followed by the binary representation of the `ReplicaHeader` object as defined in `SyncTypes.proto`:
+```proto
+message ReplicaHeader {
+  int64 sync_date = 1;                // UTC UNIX timestamp in milliseconds since epoch.
+  Transform transform = 2;            // The transform to apply to the returned geometries.
+  EsriTypes.SpatialReference sr = 3;  // The spatial reference of the returned geometries.
+}
+```
+
+## Data Model
+- The `data_model.binpb` file contains the data model of the service.
+- 64-bit unsigned variable length integer indicating the number of bytes for the data model
+- Followed by the binary representation of `GraphDataModel` in `QueryDataModelResponse.proto`
+
+## Graph Data
+The graph data can be 0..M binary protobuf files with the following naming convention:
+```
+<delta_type>_<typeName>_<uuid>.binpb
+```
+where the `delta_type` can be one of the following:
+- `add`
+- `update`
+- `delete`
+
+For example a file named `add_MyEntity_123e4567-e89b-12d3-a456-426614174000.binpb` indicates that the file contains 
+added entities with the type name `MyEntity` and a UUID of `123e4567-e89b-12d3-a456-426614174000`.
+
+Each replica data file contains 2 components:
+1. A `ReplicaDataHeader` containing metadata about the replica data in this file.
+2. The graph data represented by one or more `GraphQueryResultFrame` objects.
+
+The graph data is represented by the `GraphQueryResultFrame` as defined in `QueryResponse.proto`.
+There are `0..N` frames in the `.binpb` file
+
+Repeat the following for each frame:
+- 64-bit unsigned variable length integer indicating the number of bytes for the frame
+- Followed by the binary representation of `GraphQueryResultFrame` in `QueryResponse.proto`
+
+## Encoding Binary Protobuf File
+
+| Segment No. | Size (bytes) | Type                       | Content                        | Value Alias |
+| ----------- | ------------ |----------------------------|--------------------------------| ----------- |
+| 0           | variable     | `uint64` (varint encoding) | SizeOf `ReplicaDataHeader` msg | SzHdr       |
+| 1           | SzHdr        | `ReplicaDataHeader`        |                                |             |
+| (2 * K) + 2 | variable     | `unit64` (varint encoding) | SizeOf `GQRF`                  | SzFrame(K)  |
+| (2 * K) + 3 | SzFrame(K)   | `GraphQueryResultFrame`    |                                |             |
+
+- `K` is the number of frames processed
+- `GQRF` is `GraphQueryResultFrame`
+
 ---
 ## Contributing
 
