@@ -50,4 +50,8 @@ message ExportServiceDefinitionRequest {
   // (e.g., GeoParquet). Determines how the graph data and schema
   // are serialized.
   ExportDataFormat data_format = 2;
+  
+  // Defines the scope of graph data to include in the exported Service Definition.
+  // If this parameter is not set, all graph data is included in the export.
+  DataTransfer.Filter export_filter = 3;
 }

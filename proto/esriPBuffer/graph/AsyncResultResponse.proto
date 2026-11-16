@@ -25,6 +25,7 @@ import "esriPBuffer/graph/CreateReplicaResponse.proto";
 import "esriPBuffer/graph/SynchronizeReplicaResponse.proto";
 import "esriPBuffer/graph/ExportServiceDefinitionResult.proto";
 import "esriPBuffer/graph/TrimChangeLogResponse.proto";
+import "esriPBuffer/graph/TruncateResult.proto";
 
 // ../KnowledgeGraphServer/jobs/results/<job-id>
 
@@ -41,5 +42,6 @@ message AsyncResultResponse {
 		SynchronizeReplicaResult synchronize_replica_result = 6;
 		ExportServiceDefinitionResult export_service_definition_result = 7;
 		TrimChangeLogResult trim_result = 8;
+		TruncateResult truncate_result = 9;
 	}
 }

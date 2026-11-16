@@ -1,0 +1,84 @@
+/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+
+// Result of ../KnowledgeGraphServer/graph/truncate, returned via
+// ../KnowledgeGraphServer/jobs/results/<job-id>.
+
+// Final result of an asynchronous truncate operation.
+message TruncateResult {
+  // High-level error indicating overall success or failure of the truncate
+  // operation. A non-zero error_code indicates failure; per-type counts in
+  // `statistics` may still be populated to reflect deletions committed before
+  // the failure (truncate is non-atomic — committed batches cannot be rolled back).
+  Error error = 1;
+
+  // Warnings encountered during the truncate operation.
+  //
+  // Because truncate is executed in batched transactions and is non-atomic,
+  // individual batches may fail independently of the overall operation. The
+  // server retries each failed batch up to 3 times before surfacing the failure
+  // here as a warning. Presence of warnings indicates partial success and may
+  // require the client to retry the truncate operation.
+  repeated Error warnings = 2;
+
+  // Per-type summary of what was deleted.
+  //
+  // The map key is the named type name. The value records the type's
+  // category, the number of instances deleted, and whether the deletion
+  // was performed as a side-effect of cascade rules (cascade_deleted = true)
+  // or because the type was the explicit target of the request
+  // (cascade_deleted = false).
+  //
+  // - Single-type truncate: includes the explicit target type
+  //   (cascade_deleted = false) plus any cascade-deleted types
+  //   (cascade_deleted = true) — connected relationship types when the
+  //   target is an entity type, and the Provenance meta entity type
+  //   when Provenance is enabled.
+  // - Full-graph truncate: includes every entity, relationship, and meta
+  //   entity type that had data removed. All entries have
+  //   cascade_deleted = false because the entire graph was the explicit target.
+  //
+  // Example — truncating entity type "Person" with Provenance enabled
+  // and an outgoing "OWNS" relationship type:
+  //   "Person":     { type_category: Entity,                deleted_count: 100, cascade_deleted: false }
+  //   "Provenance": { type_category: MetaEntityProvenance,  deleted_count:  10, cascade_deleted: true  }
+  //   "OWNS":       { type_category: Relationship,          deleted_count:   2, cascade_deleted: true  }
+  map<string, TruncateTypeStats> statistics = 3;
+}
+
+// Summary statistics for a single named type involved in a truncate operation.
+message TruncateTypeStats {
+  // Whether this type is an entity, relationship, or meta entity type.
+  esriNamedTypeCategory type_category = 1;
+
+  // Number of instances of this type deleted by the truncate operation.
+  uint64 deleted_count = 2;
+
+  // True if this type was deleted as a side-effect of cascade rules
+  // (e.g., a relationship type connected to a truncated entity type, or
+  // Provenance records associated with truncated entities/relationships).
+  // False if this type was the explicit target of the truncate request:
+  // the type named in TruncateRequest.type_name, or — for full-graph
+  // truncate — every type in the graph.
+  bool cascade_deleted = 3;
+}

@@ -1,0 +1,63 @@
+/* Copyright 2026 Esri
+ *
+ * Licensed under the Apache License Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ syntax = "proto3";
+package esriPBuffer.graph;
+option java_package = "com.esri.arcgis.protobuf.graph";
+option optimize_for = LITE_RUNTIME;
+option cc_enable_arenas = true;
+
+// ../KnowledgeGraphServer/graph/truncate
+
+// Request to truncate a single named type or the entire graph.
+//
+// The truncate operation is strictly asynchronous. The server cascades
+// deletes associated provenance records and connected relationships
+// in a fixed order to avoid orphans; cascade behavior is not client-configurable.
+message TruncateRequest {
+  // The scope of the truncate operation.
+  oneof truncate_scope {
+    // Truncate a single entity type, relationship type, or meta entity type (e.g. Provenance).
+    TruncateNamedType truncate_named_type = 1;
+
+    // Truncate the entire graph: all entity types, all relationship types,
+    // and all meta entity types (e.g. Provenance).
+    TruncateGraph truncate_graph = 2;
+  }
+}
+
+// Defines a named-type-scoped truncate request.
+message TruncateNamedType {
+  // Name of a single named type to truncate. May be an entity type,
+  // a relationship type, or a meta entity type (e.g. Provenance).
+  //
+  // - Entity type: all connected relationships are cascade-deleted. If
+  //   Provenance is enabled, associated Provenance records for both the
+  //   truncated entities and the cascade-deleted relationships are also deleted.
+  // - Relationship type: if Provenance is enabled, associated Provenance
+  //   records are cascade-deleted.
+  // - Meta entity type (Provenance): all Provenance records are deleted.
+  string type_name = 1;
+}
+
+// Marker message selecting full-graph scope in TruncateRequest.
+// Modeled as a message rather than a `bool` so:
+//   - the oneof case alone unambiguously selects this scope (a `bool`
+//     in a oneof would still set the case when assigned `false`,
+//     creating an undocumented "must-be-true" invariant), and
+//   - future graph-scope options can be added here as fields without
+//     a wire-breaking change.
+message TruncateGraph {
+}
