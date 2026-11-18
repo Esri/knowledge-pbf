@@ -46,4 +46,9 @@ message ExportServiceDefinitionResult {
   // and the value provides the transfer statistics for that type,
   // including counts of items in the source versus those successfully exported.
   map<string, DataTransferStats> statistics = 6;
+  
+  // The filter that was applied to produce this export, echoed back from the request.
+  //
+  // In the case of a full graph export, no filter is applied, so this property is not set.
+  DataTransfer.Filter applied_filter = 7;
 }

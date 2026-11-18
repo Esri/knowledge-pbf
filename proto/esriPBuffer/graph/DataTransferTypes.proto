@@ -19,6 +19,9 @@ option java_package = "com.esri.arcgis.protobuf.graph";
 option optimize_for = LITE_RUNTIME;
 option cc_enable_arenas = true;
 
+import "esriPBuffer/graph/EsriGraphTypes.proto";
+import "esriPBuffer/EsriTypes.proto";
+
 // The format in which the data will be exported.
 enum ExportDataFormat {
   UNSUPPORTED_EXPORT_DATA_FORMAT = 0;
@@ -42,4 +45,229 @@ enum ExportDataFormat {
 message DataTransferStats {
   uint64 source_count = 1;
   uint64 transferred_count = 2;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// DataTransfer Filter
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+message DataTransfer {
+
+  // Filter defines the filters for the graph data and associated provenance to be included or
+  // excluded in the subgraph export.
+  message Filter {
+
+    // Applies to input geometries sent by the client to the server.
+    // These may be geometries referenced as bind parameters in the `where_clause`,
+    // or geometry literals in the `where_clause`.
+    //
+    // When `in_sr` is not set, geometries are assumed to be in the spatial reference of the data model.
+    Transform input_transform = 1;
+    EsriTypes.SpatialReference in_sr = 2;
+
+    oneof filter_type {
+
+      // The TypeFilter defines export filters using openCypher WHERE clauses.
+      // These WHERE clauses reference entity, relationship, and provenance types defined in the data model
+      // and may include spatial predicates. Since provenance types are non-spatial, using spatial predicates
+      // on provenance types may result in no provenance records being included in the export.
+      TypeFilter type_filter = 3;
+    }
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // TypeFilter
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // The `TypeFilter` defines export filters based on openCypher WHERE clauses.
+  //
+  // The WHERE clauses reference entity and relationship types defined in the data model and may
+  // include spatial predicates. For each entity or relationship type, you can choose to include
+  // associated provenance records and further refine the provenance result set using the `ProvenanceOptions`.
+  message TypeFilter {
+
+    // Defines entity type filters used to select entity records for export.
+    EntityTypeFilters entity_type_filters = 1;
+
+    // Defines relationship type filters used to select relationship records for export.
+    RelationshipTypeFilters relationship_type_filters = 2;
+  }
+
+  message EntityTypeFilters {
+
+    // Defines whether the specified entity types form an inclusion set or an exclusion set.
+    //
+    // Exactly one of the following options must be specified. If neither is set, the export
+    // request is rejected, so the client must state its intent explicitly rather than
+    // defaulting to a full export.
+    //
+    //         Option            |            Result
+    // --------------------------|--------------------------------------------------
+    // include_entity_types      | Only the listed entity types are included.
+    // exclude_entity_types      | All entity types except the listed ones are included.
+    //
+    // If include_entity_types is specified with an empty list, no entity types are included.
+    //
+    // To include all entity types, specify exclude_entity_types with an empty list.
+    oneof entity_type_selection {
+      EntityTypeDefinitions include_entity_types = 1;
+      StringArray exclude_entity_types = 2;
+    }
+  }
+
+  message RelationshipTypeFilters {
+    // Defines whether the specified relationship types form an inclusion set or an exclusion set.
+    //
+    // Exactly one of the following options must be specified. If neither is set, the export
+    // request is rejected, so the client must state its intent explicitly rather than
+    // defaulting to a full export.
+    //
+    //         Option                  |            Result
+    // --------------------------------|--------------------------------------------------
+    // include_relationship_types      | Only the listed relationship types are included.
+    // exclude_relationship_types      | All relationship types except the listed ones are included.
+    //
+    // If include_relationship_types is specified with an empty list, no relationship types are included.
+    //
+    // To include all relationship types, specify exclude_relationship_types with an empty list.
+    oneof relationship_type_selection {
+      RelationshipTypeDefinitions include_relationship_types = 1;
+      StringArray exclude_relationship_types = 2;
+    }
+  }
+
+  message EntityTypeDefinitions {
+    // Each entry identifies an entity type and optionally provides an openCypher WHERE clause
+    // that determines which entities of that type are included.
+    repeated EntityTypeDefinition entity_type_def = 1;
+  }
+
+  message RelationshipTypeDefinitions {
+    // Each entry identifies a relationship type and optionally provides an openCypher WHERE clause
+    // that determines which relationships of that type are included.
+    repeated RelationshipTypeDefinition relationship_type_def = 1;
+  }
+
+  message EntityTypeDefinition {
+
+    // Selects how entities of this type are included in the export.
+    oneof entity_type_definition {
+
+      // Entities are included based only on the `NamedTypeDefinition`, regardless of whether
+      // they are connected to any relationship included in the export.
+      NamedTypeDefinition explicit_entity_type = 1;
+
+      // Entities are included if and only if:
+      //  - they match the `NamedTypeDefinition`, and
+      //  - they are connected to at least one relationship included in the export.
+      //
+      // This excludes both entities whose relationships were filtered out by the export's
+      // relationship filters and entities that have no relationships in the graph at all.
+      NamedTypeDefinition connected_entity_type = 2;
+    }
+  }
+
+  message RelationshipTypeDefinition {
+
+    // Relationships are returned when origin and destination entity types are defined in the export filters.
+    // For example, suppose the relationship type, `OWNS` has origin entity types, `Person` and
+    // destination entity types `Vehicle` and `Parcel`.
+    //    (o:Person)-[r:OWNS]->(d:Vehicle|Parcel)
+    //
+    // `OWNS` relationships are returned in the exported service definition if and only if
+    //   1. `OWNS` is included as a relationship type in the export filters, and the relationship
+    //      satisfies the `where_clause` on its `relationship_type` definition (if one is specified).
+    //   2. A valid origin entity type and destination entity type are included in the export filters.
+    //      In our example that would include `Person` and at least one of { `Vehicle`, `Parcel` }.
+    //   3. The relationship's origin and destination entities are themselves included in the export,
+    //      i.e. they satisfy the `where_clause`s on their entity type definitions, so both end points
+    //      are exported entities.
+    //
+    // In other words, a relationship is exported only when its relationship type is selected, the
+    // relationship passes its own where clause, and both of its end points are exported entities.
+    NamedTypeDefinition relationship_type = 1;
+  }
+
+  message WhereClause {
+    // Defines an attribute query for the entity or relationship type. The query is an openCypher WHERE clause.
+    // Entities satisfying the query
+    //   MATCH (n:<type_name>) WHERE <open_cypher_where_clause> RETURN n
+    // are selected by this WhereClause. Entities must be referenced by the symbolic name `n`.
+    //
+    // Relationships satisfying the query
+    //   MATCH ()-[n:<type_name>]->() WHERE <open_cypher_where_clause> RETURN n
+    // are selected by this WhereClause. Additionally the origin and destination entities of the relationship
+    // must be defined in the export filters. Relationships must be referenced by the symbolic name `n`.
+    //
+    //  - When no `open_cypher_where_clause` is provided, all entities or relationships of the type are selected by this query.
+    //  - This query expresses the base per-type attribute selection. Options on the enclosing type
+    //    definition may further restrict the result; for example, `EntityTypeDefinition.exclude_disconnected_entities`
+    //    removes selected entities that are not connected to any relationship included in the export. That
+    //    refinement is applied to the export result as a whole and is not part of this per-type query.
+    //  - Spatial operators are supported in the `open_cypher_where_clause`.
+    //  - The `open_cypher_where_clause` can reference parameters defined in the `parameters` map.
+    string open_cypher_where_clause = 1;
+
+    // `parameters` can only contain combinations of:
+    //    - primitive values
+    //    - array values
+    //    - anonymous objects
+    // We'll throw a runtime error if the following are encountered:
+    //    - entity values
+    //    - relationship values
+    //    - path values
+    map<string, AnyValue> parameters = 2;
+  }
+
+  message NamedTypeDefinition {
+
+    // The name of the entity or relationship type to include in the export.
+    string type_name = 1;
+
+    WhereClause where_clause = 2;
+
+    // Defines the result set for associated provenance of entities or relationships
+    // defined by the `type_name` & `where_clause`.
+    ProvenanceOptions provenance_options = 3;
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Provenance Filter Options
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  message ProvenanceOptions {
+    // ProvenanceOptions define the result set for associated provenance for the specified entity or relationship type.
+    //
+    // When `include_provenance` is not set, no associated provenance is returned.
+    // Clients can opt-in by setting the `include_provenance` parameter.
+    //
+    // Further refinement of the provenance result set can be achieved by setting the fields of the
+    // `IncludeProvenance` message.
+    optional IncludeProvenance include_provenance = 1;
+  }
+
+  message IncludeProvenance {
+
+    // Defines an attribute query for the provenance meta entity type. The query is an openCypher WHERE clause.
+    //
+    // - When `include_provenance` is enabled in `ProvenanceOptions` and no
+    //   `where_clause` is provided, all non-orphaned provenance meta
+    //   entities (those associated with at least one entity or relationship included
+    //   in the export) are included in the export.
+    // - Provenance meta entity types are non-spatial. Therefore, using spatial
+    //   operators in the `where_clause` may result in no provenance
+    //   records being included in the export.
+    // - The `where_clause` can reference parameters defined in its
+    //   `parameters` map.
+    WhereClause where_clause = 1;
+
+    // `include_source_documents` determines whether the source documents of the provenance are included in the result set.
+    //
+    // When `include_source_documents` is set to true, documents set as a source of the provenance are
+    // included in the result.
+    //
+    // When `include_source_documents` is set to false, documents set as a source of the provenance are
+    // excluded from the result.
+    bool include_source_documents = 2;
+  }
 }
